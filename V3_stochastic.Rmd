@@ -38,25 +38,6 @@ knitr::opts_knit$set(root.dir = '/Users/jr35/Google Drive/My Drive/PHD_documents
 # rm(list=ls())
 ```
 
-```{r}
-# txdb <- makeTxDbFromGFF(file = "/lustre/scratch118/malaria/team222/jr35/Pf3D7_genomes_gtfs_indexs/PlasmoDB-52_Pfalciparum3D7.gff", format = "gff") 
-# introns <- intronsByTranscript(txdb)
-```
-
-```{r}
- # unlist(introns)
-```
-
-```{r}
-# uli = unlist(introns)
-# iwidths = width(uli)
-# lintrons = relist(iwidths, introns)
-# head(lintrons)
-```
-
-```{r}
-#The sum of intron lengths per transcript:
-```
 
 ```{r}
 .libPaths()
@@ -78,9 +59,6 @@ scv$logging$print_version()
 ls()
 ```
 
-```{r}
-# plt <- reticulate::import("matplotlib.pyplot") 
-```
 
 ```{r}
 v3_bf2_names <- c("D5", "D10a","D10b", "D10a_D10b", "all_days")
@@ -234,10 +212,6 @@ scv_names <- names(ef_scv_stochastic)
 ```
 
 ```{r}
-# ef_scv_stochastic['day5']
-```
-
-```{r}
 pf_introns <- read_csv('data/raw/introns.csv') %>% dplyr::select(-c(...1)) 
 ```
 
@@ -249,60 +223,6 @@ gene_intron_size <-pf_introns %>% group_by(gene_id) %>% summarise(intron_size = 
 # gene_intron_size 
 ```
 
-```{r}
-# options(repr.plot.width=32, repr.plot.height=7)
-
-# ef_scv_stochastic %>% 
-# map(. %>%
-#     .@meta.data  %>% 
-#     group_by(strain) %>% 
-#     arrange(desc(nCount_RNA)) %>%
-#     mutate(rank = row_number()) %>% 
-#     ungroup())%>% 
-#     map(., ~ggplot(.x, aes(x=total_unspliced,y=intron_size, color = 'isoforms')) + 
-#         geom_point() + 
-#         theme(text = element_text(size=20))) %>%
-# plot_grid(plotlist = ., labels = scv_bf2_names, ncol = 5)
-# # options(repr.plot.width=7, repr.plot.height=7)
-```
-
-```{r, fig.width= 32, fig.height=14}
-# options(repr.plot.width=32, repr.plot.height=14)
-
-intron_size_vs_spliced <- ef_scv_stochastic %>% 
-map(. %>%
-    .$var %>%
-    dplyr::select('Gene_ID', 'total_unspliced', 'mean_unspliced', 'n_cells_by_unspliced', 'total_spliced', 'mean_spliced', 'n_cells_by_spliced') %>% 
-    left_join(., gene_intron_size, by=c('Gene_ID'='gene_id'))) %>%
-map(., ~ggscatter(., x='total_unspliced',y='intron_size', color = 'isoforms',
-                  add = "reg.line",  # Add regressin line
-                  add.params = list(color = "blue", fill = "lightgray"), # Customize reg. line
-                  conf.int = TRUE  # Add confidence interval) 
-                 )
-   ) %>%
-map(~. + stat_cor(method = "pearson", label.x = 3000, label.y = 3000))
-# stat_cor(method = "pearson", label.x = 50, label.y = 200)
-
-plot_grid(plotlist = intron_size_vs_spliced, labels = scv_names, ncol = 3)
-# options(repr.plot.width=7, repr.plot.height=7)
-```
-
-```{r, fig.width= 32, fig.height=7}
-# options(repr.plot.width=32, repr.plot.height=7)
-
-ef_scv_stochastic %>% 
-map(. %>%
-    .$var %>%
-    filter(velocity_genes =='TRUE') %>%
-    dplyr::select('Gene_ID', 'total_unspliced', 'mean_unspliced', 'n_cells_by_unspliced', 'total_spliced', 'mean_spliced', 'n_cells_by_spliced') %>% 
-    left_join(., gene_intron_size, by=c('Gene_ID'='gene_id'))) %>%
-    map(., ~ggplot(.x, aes(x=log1p(total_unspliced),y=log1p(intron_size), color = isoforms)) + 
-        geom_point() + 
-        theme(text = element_text(size=20))) %>%
-plot_grid(plotlist = ., labels = scv_names, ncol = 5)
-
-# options(repr.plot.width=7, repr.plot.height=7)
-```
 
 ```{r, fig.width= 28, fig.height=7}
 # options(repr.plot.width=28, repr.plot.height=7)
@@ -333,24 +253,6 @@ plot_grid(plotlist = .,labels = names(ef_scv_stochastic), label_size = 24, hjust
 # options(repr.plot.width=7, repr.plot.height=7)
 ```
 
-```{r, fig.width= 32, fig.height=7}
-options(repr.plot.width=32, repr.plot.height=7)
-
-ef_scv_stochastic %>% 
-map(. %>%
-    .$var %>%
-    filter(velocity_genes =='TRUE') %>%
-    dplyr::select('Gene_ID', 'total_unspliced', 'total_spliced') %>% 
-    left_join(., gene_intron_size, by=c('Gene_ID'='gene_id'))) %>%
-    map(., ~ggplot(.x, aes(x=log1p(intron_size),y=log1p(total_unspliced), color = isoforms)) +
-        geom_point() + 
-        geom_smooth(method='lm', formula= y~x)+ 
-        stat_cor(method = "pearson", label.x = 5, label.y = 4.5)+
-        theme(text = element_text(size=20))) %>%
-plot_grid(plotlist = ., labels = names(ef_scv_stochastic), ncol = 5)
-
-# options(repr.plot.width=7, repr.plot.height=7)
-```
 
 ```{r}
 lowerfun <- function(data, mapping) {
@@ -424,26 +326,7 @@ for (i in c("total_spliced", "total_unspliced")) {
 #     })
 ```
 
-```{r}
-# for (i in c("spliced", "unspliced")) {
-#   png('total_count_scatter.png', 
-#       width = 0.85*(0.75 * length(methods) + 6.5), 
-#       height = 0.85*(0.75 * length(methods) + 6.5), unit = "in", res = 400)
-#   print(GGally::ggpairs(
-#     sumdf_bygene %>% 
-#       # dplyr::left_join(methods_short, by = "method") %>%
-#       dplyr::select(c("gene", "method", i)) %>%
-#       tidyr::spread(key = "method", value = i) %>% 
-#       tibble::column_to_rownames("gene") %>%
-#       dplyr::mutate_all(.funs = log1p),
-#     lower = list(continuous = GGally::wrap(lowerfun)),
-#     title = paste0(dataset, ", ", i), xlab = "log(total gene count + 1)", 
-#     ylab = "log(total gene count + 1)") + 
-#       theme(strip.text = element_text(size = 8.75 - 0.25 * length(methods)))
-#   )
-#   dev.off()
-# }
-```
+
 
 ```{r}
 #gene and cell names
@@ -547,43 +430,8 @@ ggplot(., aes(x=`Velocities estimated`, y=log1p(total_unspliced), fill=Days)) +
 geom_boxplot()
 ```
 
-```{r}
-# list(ef_scv_stochastic,bf2_vels)  %>%
-# pmap(~ ..1$var %>%
-#     dplyr::select(Gene_ID, velocity_genes, fit_alpha, fit_beta, total_unspliced,anno_300cells) %>%
-#     left_join(., colSums(..2) %>% data.frame() %>% dplyr::rename('velo_sums'='.') %>%rownames_to_column('bcode'), by=c('Gene_ID'='bcode') ) %>%
-#     mutate(`Velocities estimated` = ifelse(is.na(velo_sums), 'No', 'Yes')) %>%
-#      # filter(!is.na(velo_sums)) %>%
-#     dplyr::count(anno_300cells)
-#     ) %>%
-# dplyr::bind_rows(., .id='Days') %>%
-# ggplot(., aes(x=Days, y=n, fill=anno_300cells)) +
-# geom_col()
-```
 
-```{r, results="hide"}
-list(ef_scv_stochastic,bf2_vels)  %>% 
-pmap(~ ..1$obs %>%
-    # filter(!is.na(velo_sums)) %>%
-    dplyr::count(anno_300cells)
-    ) %>%
-bind_rows(., .id='Days')
-```
 
-```{r}
-#  +
-# geom_text(aes(label = n), position = position_dodge2(width = 0.8), vjust =0.5, hjust =1.2, size =8, angle = 90)+
-# theme(axis.text=element_text(size=18), 
-#       axis.title=element_text(size=22,face="bold"), 
-#       legend.text = element_text(size=22), 
-#       legend.title = element_text(size=20,face="bold"),
-#       strip.text.x = element_text(size = 20),
-#       strip.text.y = element_text(size = 20),
-#      plot.title = element_text(size = 20,hjust = 0.5,face="bold") ) + 
-# rotate_x_text() +
-# # guides(fill=guide_legend(title="Velocities \nestimated")) +
-# labs(y='Count')
-```
 
 ```{r, eval=FALSE}
 system(
@@ -619,18 +467,18 @@ map(. %>%
 ```
 
 ```{r}
-corr_genes <- list.files("data/processed/RoadtoUMAP/", pattern = "_PfDB.csv", full.names = T, recursive = T, include.dirs = T) %>%
-set_names(nm = (str_remove_all(.,'data/processed/RoadtoUMAP//|_PfDB.csv'))) %>%
-map(read_csv) %>%
-map(. %>%
-    rename('ID' = 1)%>%
-    rename_at(vars(matches('^Female|^Male')), ~ str_remove(.x,'Female.|Male.')))
+# corr_genes <- list.files("data/processed/RoadtoUMAP/", pattern = "_PfDB.csv", full.names = T, recursive = T, include.dirs = T) %>%
+# set_names(nm = (str_remove_all(.,'data/processed/RoadtoUMAP//|_PfDB.csv'))) %>%
+# map(read_csv) %>%
+# map(. %>%
+#     rename('ID' = 1)%>%
+#     rename_at(vars(matches('^Female|^Male')), ~ str_remove(.x,'Female.|Male.')))
 ```
 
 ```{r}
-corr_genes %>% 
+stocha_pk_corr_genes %>%
 map(. %>%
-    dplyr::filter(qval < 0.00005 & corr > 0.5) %>%
+    dplyr::filter(qval < 0.00005 & (corr > 0.4|corr < -0.4)) %>%
     arrange(desc(corr)) %>%
    pull(`Gene`))
 ```
@@ -648,25 +496,17 @@ juli_markers<- c('PF3D7_1466800','PF3D7_1146800', 'PF3D7_0114000', 'PF3D7_103840
 ```
 
 ```{r}
-corr_genes %>% 
+stocha_pk_corr_genes %>% 
 map(. %>%
-    dplyr::filter(qval < 0.005 & corr > 0.1) %>%
+    dplyr::filter(qval < 0.005 & ( corr < -0.2 | corr > 0.2)) %>%
     dplyr::filter(ID %in% juli_markers) %>%
     arrange(desc(corr)) )
 ```
 
 ```{r}
-stocha_corr_genes %>% 
+stocha_pk_corr_genes %>% 
 map(. %>%
-    dplyr::filter( corr < -0.2 | corr > 0.2) %>%
-    dplyr::filter(ID %in% juli_markers) %>%
-    arrange(desc(corr)) )
-```
-
-```{r}
-corr_genes %>% 
-map(. %>%
-    dplyr::filter( corr < -0.2 | corr > 0.2) %>%
+    dplyr::filter(qval < 0.005 & ( corr < -0.2 | corr > 0.2)) %>%
     dplyr::filter(ID %in% andy_markers) %>%
     arrange(desc(corr)) )
 ```
@@ -674,43 +514,9 @@ map(. %>%
 ```{r}
 stocha_pk_corr_genes %>% 
 map(. %>%
-    dplyr::filter( corr < -0.2 | corr > 0.2) %>%
-    dplyr::filter(ID %in% andy_markers) %>%
-    arrange(desc(corr)) )
-```
-
-```{r}
-stocha_corr_genes %>% 
-map(. %>%
-    dplyr::filter(corr < -0.2 | corr > 0.2) %>%
-    dplyr::filter(ID %in% andy_markers) %>%
-    arrange(desc(corr)) )
-```
-
-
-
-```{r}
-corr_genes %>% 
-map(. %>%
-    dplyr::filter(qval < 0.005 & corr > 0.1) %>%
+    dplyr::filter(qval < 0.005 & ( corr < -0.2 | corr > 0.2)) %>%
     dplyr::filter(ID %in% early_gam) %>%
     arrange(desc(corr)) )
-```
-
-```{r}
-corr_genes %>% 
-map(. %>%
-    dplyr::filter(pval < 0.00005 & corr > 0.4) %>%
-    arrange(desc(corr)) %>%
-   pull(`Gene`))
-```
-
-```{r}
-corr_genes %>% 
-map(. %>%
-    dplyr::filter(pval < 0.00005 & corr > 0.4) %>%
-    arrange(desc(corr)) %>%
-   pull(ID))
 ```
 
 
@@ -755,102 +561,6 @@ DimPlot(Road2UMAP, reduction = "umap", dims = c(2,3))
 FeaturePlot(Road2UMAP, features = c('PF3D7-1348800', 'PF3D7-1477700','PF3D7-0500800', 'PF3D7-0114000', 'PF3D7-0220200'), dims = c(2,3))
 ```
 
-```{r}
-# dr_gns <- corr_genes %>% 
-# map(. %>%
-#     dplyr::filter(qval < 0.001 & corr > 0.2) %>%
-#     group_by(ID) %>%
-#     summarise(across('Timepoint', ~(toString(na.omit(.))))) %>%
-#     filter(!is.na(ID))
-#    ) %>%
-# bind_rows(., .id='sex_n_cluster') %>%
-# pivot_wider(names_from = 'sex_n_cluster', values_from = 'Timepoint') %>%
-# mutate(CDgam_sex = case_when(!is.na(female_drivers_in_CDB) &  is.na(male_drivers_in_CDB) ~ 'Female',
-#                              !is.na(male_drivers_in_CDB) & is.na(female_drivers_in_CDB) ~ 'Male',
-#                              !is.na(female_drivers_in_CDB) &  !is.na(male_drivers_in_CDB) ~ 'Female,Male'),
-#       Bgam_sex = case_when(!is.na(female_drivers_in_gambranch) &  is.na(male_drivers_in_gambranch) ~ 'Female',
-#                            !is.na(male_drivers_in_gambranch) & is.na(female_drivers_in_gambranch) ~ 'Male',
-#                            !is.na(female_drivers_in_gambranch) &  !is.na(male_drivers_in_gambranch) ~ 'Female,Male'))
-```
-
-```{r}
-dr_gns_all <- corr_genes %>% 
-    map(. %>% select(ID, Timepoint_freq, Gene, source_id, `Gene ID`, qval, corr,Timepoint) %>%
-          dplyr::filter(qval < 0.001 )%>%
-          dplyr::filter(corr < -0.2 | corr > 0.2) %>% 
-          mutate(dir = case_when(corr<0 ~ 'anti-correlated',
-                                 corr>0 ~ 'correlated')) %>%
-          pivot_wider(names_from = Timepoint, values_from = c(corr, qval,dir))) %>% 
-  bind_rows(., .id='sex_n_cluster') %>%
-            pivot_wider(names_from = 'sex_n_cluster', values_from = matches('corr*|qval*|dir*')) %>%
-   mutate(CDgam_sex = case_when(if_any(contains('female_drivers_in_CDB'), ~!is.na(.)) &  if_any(contains('male_drivers_in_CDB'), ~is.na(.)) ~ 'Female',
-                                if_any(contains('male_drivers_in_CDB'), ~!is.na(.)) &  if_any(contains('female_drivers_in_CDB'), ~is.na(.)) ~ 'Male',
-                                if_any(contains('female_drivers_in_CDB'), ~!is.na(.)) &  if_any(contains('male_drivers_in_CDB'), ~!is.na(.)) ~ 'Female,Male'),
-          Bgam_sex = case_when(if_any(contains('female_drivers_in_gambranch'), ~!is.na(.)) &  if_any(contains('male_drivers_in_gambranch'), ~is.na(.)) ~ 'Female',
-                                if_any(contains('male_drivers_in_gambranch'), ~!is.na(.)) &  if_any(contains('female_drivers_in_gambranch'), ~is.na(.)) ~ 'Male',
-                                if_any(contains('female_drivers_in_gambranch'), ~!is.na(.)) &  if_any(contains('male_drivers_in_gambranch'), ~!is.na(.)) ~ 'Female,Male'),
-          lR_eT_Asex_gam = case_when(if_any(contains('early_schizont_drivers_in_lReT'), ~!is.na(.)) &  if_any(contains('early_gam_drivers_in_lReT'), ~is.na(.)) ~ 'Asexual',
-                                if_any(contains('early_gam_drivers_in_lReT'), ~!is.na(.)) &  if_any(contains('early_schizont_drivers_in_lReT'), ~is.na(.)) ~ 'Gametocyte',
-                                if_any(contains('early_schizont_drivers_in_lReT'), ~!is.na(.)) &  if_any(contains('early_gam_drivers_in_lReT'), ~!is.na(.)) ~ 'Asexual,Gametocyte')) %>%
-  dplyr::rename_all(~str_replace_all(.,"male_drivers", "male"))
-  
-```
-
-```{r}
-# stocha_corr_genes %>% 
-# map(. %>%
-#     dplyr::filter(qval < 0.001 & corr > 0.2) %>%
-#       filter(!is.na(`Gene ID`)) %>%
-#       filter(is.na(`corr`))
-#    )
-```
-
-```{r}
-stocha_dr_gns <- stocha_corr_genes %>% 
-map(. %>%
-    dplyr::filter(qval < 0.001 & corr > 0.2) %>%
-    group_by(ID) %>%
-    summarise(across('Timepoint', ~(toString(na.omit(.))))) %>%
-    filter(!is.na(ID))
-   ) %>%
-bind_rows(., .id='sex_n_cluster') %>%
-pivot_wider(names_from = 'sex_n_cluster', values_from = 'Timepoint') %>%
-mutate(CDgam_sex = case_when(!is.na(female_drivers_in_CDB) &  is.na(male_drivers_in_CDB) ~ 'Female',
-                             !is.na(male_drivers_in_CDB) & is.na(female_drivers_in_CDB) ~ 'Male',
-                             !is.na(female_drivers_in_CDB) &  !is.na(male_drivers_in_CDB) ~ 'Female,Male'),
-      Bgam_sex = case_when(!is.na(female_drivers_in_gambranch) &  is.na(male_drivers_in_gambranch) ~ 'Female',
-                           !is.na(male_drivers_in_gambranch) & is.na(female_drivers_in_gambranch) ~ 'Male',
-                           !is.na(female_drivers_in_gambranch) &  !is.na(male_drivers_in_gambranch) ~ 'Female,Male'),
-      lR_eT_Asex_gam = case_when(!is.na(early_schizont_drivers_in_lReT) &  is.na(early_gam_drivers_in_lReT) ~ 'Asexual',
-                                 !is.na(early_gam_drivers_in_lReT) & is.na(early_schizont_drivers_in_lReT) ~ 'Gametocyte',
-                                 !is.na(early_schizont_drivers_in_lReT) &  !is.na(early_gam_drivers_in_lReT) ~ 'Asexual,Gametocyte')) 
-  
-```
-
-```{r}
-# stocha_gns <- stocha_corr_genes %>% 
-#     map(. %>% select(ID, Timepoint_freq, Gene, source_id, `Gene ID`, qval, corr,Timepoint) %>%
-#             dplyr::filter(qval < 0.001 )%>% 
-#             dplyr::filter(corr < -0.2 | corr > 0.2) %>% 
-#             mutate(dir = case_when(corr<0 ~ 'anti-correlated', 
-#                                         corr>0 ~ 'correlated')) %>%
-#             pivot_wider(names_from = Timepoint, values_from = c(corr, qval,dir))) %>%
-#     bind_rows(., .id='sex_n_cluster') %>%
-#     pivot_wider(names_from = 'sex_n_cluster', values_from = c('corr_all_days', 'corr_all', 'qval_all_days', 'qval_all', 'dir_all_days', 'dir_all')) %>%
-#    mutate(CDgam_sex = case_when(if_any(contains('female_drivers_in_CDB'), ~!is.na(.)) &  if_any(contains('male_drivers_in_CDB'), ~is.na(.)) ~ 'Female',
-#                                 if_any(contains('male_drivers_in_CDB'), ~!is.na(.)) &  if_any(contains('female_drivers_in_CDB'), ~is.na(.)) ~ 'Male',
-#                                 if_any(contains('female_drivers_in_CDB'), ~!is.na(.)) &  if_any(contains('male_drivers_in_CDB'), ~!is.na(.)) ~ 'Female,Male'),
-#           Bgam_sex = case_when(if_any(contains('female_drivers_in_gambranch'), ~!is.na(.)) &  if_any(contains('male_drivers_in_gambranch'), ~is.na(.)) ~ 'Female',
-#                                 if_any(contains('male_drivers_in_gambranch'), ~!is.na(.)) &  if_any(contains('female_drivers_in_gambranch'), ~is.na(.)) ~ 'Male',
-#                                 if_any(contains('female_drivers_in_gambranch'), ~!is.na(.)) &  if_any(contains('male_drivers_in_gambranch'), ~!is.na(.)) ~ 'Female,Male'),
-#           lR_eT_Asex_gam = case_when(if_any(contains('early_schizont_drivers_in_lReT'), ~!is.na(.)) &  if_any(contains('early_gam_drivers_in_lReT'), ~is.na(.)) ~ 'Asexual',
-#                                 if_any(contains('early_gam_drivers_in_lReT'), ~!is.na(.)) &  if_any(contains('early_schizont_drivers_in_lReT'), ~is.na(.)) ~ 'Gametocyte',
-#                                 if_any(contains('early_schizont_drivers_in_lReT'), ~!is.na(.)) &  if_any(contains('early_gam_drivers_in_lReT'), ~!is.na(.)) ~ 'Asexual,Gametocyte')) %>%
-#   dplyr::rename_all(~str_replace_all(.,"male_drivers", "male")) %>%
-#   dplyr::rename_all(~str_replace_all(.,"early_schizont_drivers", "asexual")) %>%
-#   dplyr::rename_all(~str_replace_all(.,"early_gam_drivers", "gametocyte"))
-#   
-```
 
 ```{r}
 stocha_gns <- stocha_corr_genes %>% 
@@ -933,13 +643,6 @@ stocha_gns <- stocha_corr_genes %>%
 ```
 
 
-```{r}
-# stocha_pk_corr_genes %>% 
-# map(. %>%
-#     dplyr::filter( corr < -0.2 | corr > 0.2) %>%
-#     dplyr::filter(ID %in% andy_markers) %>%
-#     arrange(desc(corr)) )
-```
 
 ```{r}
 ##Help with map https://stackoverflow.com/questions/68231455/how-to-use-map-if-based-on-the-name-of-each-element-in-the-list
@@ -973,7 +676,7 @@ stocha_pk_gns <- stocha_pk_corr_genes %>%
       if_any(matches('di.*_male_drivers_vkck'), ~.== 'correlated') ~ 'Male'
       ),
     Asex_gam_stocha_VKCK = case_when(
-      if_any(matches('d.*_asexual_drivers_vkck'), ~.== 'correlated') & if_any(matches('d.*_early_gam_drivers_in_lReT_stocha'), ~.== 'correlated') ~ 'Asexual,Gametocyte',
+      if_any(matches('d.*_asexual_drivers_vkck'), ~.== 'correlated') & if_any(matches('d.*_early_gam_drivers_vkck'), ~.== 'correlated') ~ 'Asexual,Gametocyte',
       if_any(matches('d.*_asexual_drivers_vkck'), ~.== 'correlated')  ~ 'Asexual',
       if_any(matches('d.*_early_gam_drivers_vkck'), ~.== 'correlated') ~ 'Gametocyte'
       ),
@@ -1019,108 +722,15 @@ stocha_pk_gns <- stocha_pk_corr_genes %>%
 ```
 
 ```{r}
-stocha_dr_gns %>% filter(ID %in% c('PF3D7_0936600'))
-```
-
-```{r}
-# corr_genes[[4]] %>% 
-# # distinct(`Gene ID`, .keep_all = T) %>%
-# filter(qval < 0.0005 & (corr > 0.2 | corr < -0.2)) %>%
-# dplyr::select(Gene_ID, corr, qval, Timepoint) %>%
-# pivot_wider(names_from = Timepoint, values_from = c('corr','qval')) %>%
-# tibble::column_to_rownames("ID")
-```
-
-```{r}
-print(GGally::ggpairs(stocha_corr_genes[[4]] %>%
-                          filter(!is.na(ID) & qval < 0.001 ) %>%
-                            dplyr::select(ID, corr, Timepoint) %>%
-                            pivot_wider(names_from = Timepoint, values_from = c('corr')) %>%
+print(GGally::ggpairs(stocha_pk_gns %>%
+                          filter(!is.na(Bgam_sex_PK_anti) & !is.na(Bgam_sex_PK)) %>%
+                            dplyr::select(corr_male_vkck, corr_female_vkck,corr_male_pk, corr_female_pk, ID) %>%
                             tibble::column_to_rownames("ID"),
                           # dplyr::mutate_all(.funs = log1p),
                           lower = list(continuous = GGally::wrap(lowerfun)),
-                          title = paste0("Comparison of vo counts between days"), 
-                          xlab = paste("log(count + 1)")) +
+                          title = paste0("Comparison of correlations counts between sex and driver genes methods")) +
           theme(strip.text = element_text(size = 8.75 - 0.25 * 1))
           )
-```
-
-```{r}
-# suppressWarnings({
-# for (i in c("fit_alpha", "fit_beta", "fit_gamma")) {
-#     print(GGally::ggpairs(ef_scv_stochastic %>%
-#                           map(. %>%
-#                               .$var %>%
-#                               dplyr::select('Gene_ID', all_of(i)))%>%
-#                           bind_rows(., .id = "Days") %>%
-#                           dplyr::select(c("Gene_ID", "Days", i)) %>%
-#                           tidyr::spread(key = "Days", value = i) %>%
-#                           tibble::column_to_rownames("Gene_ID") %>%
-#                           dplyr::mutate_all(.funs = log1p),
-#                           lower = list(continuous = GGally::wrap(lowerfun)),
-#                           title = paste0("Comparison of ", i," counts between days"), 
-#                           xlab = paste("log(",i," + 1)")) +
-#           theme(strip.text = element_text(size = 8.75 - 0.25 * 1))
-#           )
-#     }
-#     })
-```
-
-```{r}
-# dr_gns_neg <- corr_genes %>% 
-# map(. %>%
-#     dplyr::filter(qval < 0.001 & corr < -0.2) %>%
-#     group_by(ID) %>%
-#     summarise(across('Timepoint', ~(toString(na.omit(.))))) %>%
-#     filter(!is.na(ID))
-#    ) %>%
-# bind_rows(., .id='sex_n_cluster') %>%
-# pivot_wider(names_from = 'sex_n_cluster', values_from = 'Timepoint') %>%
-# mutate(CDgam_sex = case_when(!is.na(female_drivers_in_CDB) &  is.na(male_drivers_in_CDB) ~ 'Female',
-#                              !is.na(male_drivers_in_CDB) & is.na(female_drivers_in_CDB) ~ 'Male',
-#                              !is.na(female_drivers_in_CDB) &  !is.na(male_drivers_in_CDB) ~ 'Female,Male'),
-#       Bgam_sex = case_when(!is.na(female_drivers_in_gambranch) &  is.na(male_drivers_in_gambranch) ~ 'Female',
-#                            !is.na(male_drivers_in_gambranch) & is.na(female_drivers_in_gambranch) ~ 'Male',
-#                            !is.na(female_drivers_in_gambranch) &  !is.na(male_drivers_in_gambranch) ~ 'Female,Male'))
-```
-
-```{r}
-stocha_dr_gns_neg <- stocha_corr_genes %>% 
-map(. %>%
-    dplyr::filter(qval < 0.001 & corr < -0.2) %>%
-    group_by(ID) %>%
-    summarise(across('Timepoint', ~(toString(na.omit(.))))) %>%
-    filter(!is.na(ID))
-   ) %>%
-bind_rows(., .id='sex_n_cluster') %>%
-pivot_wider(names_from = 'sex_n_cluster', values_from = 'Timepoint') %>%
-mutate(CDgam_sex = case_when(!is.na(female_drivers_in_CDB) &  is.na(male_drivers_in_CDB) ~ 'Female',
-                             !is.na(male_drivers_in_CDB) & is.na(female_drivers_in_CDB) ~ 'Male',
-                             !is.na(female_drivers_in_CDB) &  !is.na(male_drivers_in_CDB) ~ 'Female,Male'),
-      Bgam_sex = case_when(!is.na(female_drivers_in_gambranch) &  is.na(male_drivers_in_gambranch) ~ 'Female',
-                           !is.na(male_drivers_in_gambranch) & is.na(female_drivers_in_gambranch) ~ 'Male',
-                           !is.na(female_drivers_in_gambranch) &  !is.na(male_drivers_in_gambranch) ~ 'Female,Male'),
-      lR_eT_Asex_gam = case_when(!is.na(early_schizont_drivers_in_lReT) &  is.na(early_gam_drivers_in_lReT) ~ 'Asexual(schizont)',
-                                 !is.na(early_gam_drivers_in_lReT) & is.na(early_schizont_drivers_in_lReT) ~ 'Gametocyte',
-                                 !is.na(early_schizont_drivers_in_lReT) &  !is.na(early_gam_drivers_in_lReT) ~ 'Asexual(schizont),Gametocyte'))
-```
-
-```{r}
-stocha_corr_genes[[1]] %>%pull(ID) %>% duplicated() %>% table()
-```
-
-```{r, fig.width= 12, fig.height=7}
-options(repr.plot.width=12, repr.plot.height=7)
-
-ggvenn(list('all_days' = stocha_dr_gns %>% filter(if_any(contains('drivers'), ~str_detect(.,'all_days'))) %>% pull(ID),
-            'all' = stocha_dr_gns %>% filter(if_any(contains('drivers'), ~str_detect(.,'all$'))) %>% pull(ID)#,
-            # 'day10a' = stocha_dr_gns %>% filter(if_any(contains('drivers'), ~str_detect(.,'day10'))) %>% pull('Gene ID'),
-            # 'day10b' = stocha_dr_gns %>% filter(if_any(contains('drivers'), ~str_detect(.,'day10b'))) %>% pull('Gene ID')
-           ),
-       fill_color = c("#0073C2FF", "#EFC000FF", "#868686FF", "#A46868"),
-       stroke_size = 0.5, set_name_size = 4
-      )
-# options(repr.plot.width=7, repr.plot.height=7)
 ```
 
 
@@ -1153,98 +763,63 @@ corr_clustr_venn()
 ```
 
 
-
-
-
 ```{r}
-##CDB and gambranch correlation and (anti-)correlation
+##BF1
 ##Assess the overlap between genes based on correlation (or anti-correlation) in CDB to either femaleness or maleness in overal(all) and alldays
-corr_clustr_venn(corr_stage1 = 'dir_a.*_female_in_', corr_stage2 = 'dir_a.*_male_in_', sufx='ness')
+##All
+corr_clustr_venn(corr_stage1 = 'dir_.*_asexual_in_lReT', corr_stage2 = 'dir_.*_gametocyte_in_lReT', sufx='')
+
+##All_days  independently
+corr_clustr_venn(corr_stage1 = 'dir_all_d.*_asexual_in_lReT', corr_stage2 = 'dir_all_d.*_gametocyte_in_lReT', sufx='')
 ```
 
 ```{r}
-##PK male and femaleness correlation and (anti-)correlation
-corr_clustr_venn(dset = stocha_pk_gns, corr_stage1 = 'd.*_male_pk', corr_stage2 = 'd.*_female_pk', sufx='ness')
-```
+##BF2
+##All & All DAYS CDB and gambranch correlation and (anti-)correlation
+corr_clustr_venn(corr_stage1 = 'dir_a.*_female_in', corr_stage2 = 'dir_a.*_male_in', sufx='ness')
 
-```{r}
-##VKCK male and femaleness correlation and (anti-)correlation
-corr_clustr_venn(dset = stocha_pk_gns, corr_stage1 = 'd.*_male_vkck', corr_stage2 = 'd.*_female_vkck', sufx='ness')
-```
-
-```{r}
-##VKCK male and femaleness correlation and (anti-)correlation
-corr_clustr_venn(dset = stocha_pk_gns, corr_stage1 = 'd.*_male_', corr_stage2 = 'd.*_female_', sufx='ness')
-```
-
-
-```{r}
-##all_days  CDB and gambranch correlation and (anti-)correlation
+##All DAYS CDB & gambranch 
 corr_clustr_venn(corr_stage1 = 'dir_all_da.*_female_in', corr_stage2 = 'dir_all_da.*_male_in', sufx='ness')
+
+##All DAYS CDB independently
+corr_clustr_venn(corr_stage1 = 'dir_all_da.*_female_in_CDB', corr_stage2 = 'dir_all_da.*_male_in_CDB', sufx='ness')
+
+##All DAYS gambranch independently
+corr_clustr_venn(corr_stage1 = 'dir_all_da.*_female_in_gambranch', corr_stage2 = 'dir_all_da.*_male_in_gambranch', sufx='ness')
 ```
 
 
 ```{r}
-##aall CDB and gambranch correlation and (anti-)correlation
-corr_clustr_venn(corr_stage1 = 'di.*l_female_in_', corr_stage2 = 'di.*l_male_in_', sufx='ness')
+###BF1
+#VKCK & PK male and femaleness correlation and (anti-)correlation
+corr_clustr_venn(dset = stocha_pk_gns, corr_stage1 = 'd.*_asexual_' , corr_stage2 = 'd.*_gametocyte_', sufx='ness')
+
+##PK correlation and (anti-)correlation
+corr_clustr_venn(dset=stocha_pk_gns, corr_stage1 = 'd.*_asexual_pk', corr_stage2 = 'd.*_gametocyte_pk', sufx='ness')
+corr_clustr_venn(dset=stocha_pk_gns, corr_stage1 = 'd.*_asexual_vkck', corr_stage2 = 'd.*_gametocyte_vkck', sufx='ness')
+
 ```
 
 ```{r}
-##PK all_days CDB correlation and (anti-)correlation
-##Assess the overlap between genes based on correlation (or anti-corretion) in CDB to either femaleness or maleness in overal(all) and alldays
+###BF2
+#VKCK & PK male and femaleness correlation and (anti-)correlation
+corr_clustr_venn(dset = stocha_pk_gns, corr_stage1 = 'd.*_female_' , corr_stage2 = 'd.*_male_', sufx='ness')
+
+##PK correlation and (anti-)correlation
 corr_clustr_venn(dset=stocha_pk_gns, corr_stage1 = 'd.*_female_pk', corr_stage2 = 'd.*_male_pk', sufx='ness')
 corr_clustr_venn(dset=stocha_pk_gns, corr_stage1 = 'd.*_female_vkck', corr_stage2 = 'd.*_male_vkck', sufx='ness')
 
 ```
 
-```{r}
-##All DAYS CDB independently
-corr_clustr_venn(corr_stage1 = 'dir_all_da.*_female_in_CDB', corr_stage2 = 'dir_all_da.*_male_in_CDB', sufx='ness')
-```
-
-
-```{r}
-##All DAYS gambracch independently
-corr_clustr_venn(corr_stage1 = 'dir_all_da.*_female_in_gambranch', corr_stage2 = 'dir_all_da.*_male_in_gambranch', sufx='ness')
-```
 
 ```{r}
 # stocha_gns %>% filter(!is.na(Bgam_sex_all_days) & !is.na(Bgam_sex_all_days_anti)) %>% select(ID, Gene, Bgam_sex_all_days, Bgam_sex_all_days_anti, corr_all_days_male_in_gambranch, qval_all_days_male_in_gambranch, corr_all_days_female_in_gambranch, qval_all_days_female_in_gambranch) %>% View
-```
-
-
-```{r}
-##All gambracch independently
-corr_clustr_venn(corr_stage1 = 'di.*l_female_in_gambranch', corr_stage2 = 'di.*l_male_in_gambranch', sufx='ness')
-```
-
-
-```{r}
-##All_days gambracch independently
-corr_clustr_venn(corr_stage1 = 'dir_all_d.*_asexual_in_lReT', corr_stage2 = 'dir_all_d.*_gametocyte_in_lReT', sufx='')
 ```
 
 ```{r}
 # stocha_gns %>% filter(!is.na(lR_eT_Asex_gam_all_days) | !is.na(lR_eT_Asex_gam_all_days_anti)) %>% select(ID,Gene, lR_eT_Asex_gam_all_days, lR_eT_Asex_gam_all_days_anti, corr_all_days_gametocyte_in_lReT , qval_all_days_gametocyte_in_lReT,corr_all_days_asexual_in_lReT , qval_all_days_asexual_in_lReT) %>% View
 ```
 
-```{r, fig.width= 7, fig.height=7}
-##All DAYS CDB and gambranch independently
-# corr_clustr_venn1 <- function(corr_clustr, day){
-#   #stocha_gns %>% filter(if_any(contains('drivers'), ~str_detect(.,'all_days'))) %>% filter((!! rlang::sym(corr_clustr)) == day) 
-#   stocha_gns %>% filter(if_any(contains('drivers'), ~str_detect(.,'all_days'))) %>% filter(!is.na(!! rlang::sym(corr_clustr))) 
-# 
-#   }
-# 
-# # corr_clustr_venn('female_drivers_in_CDB')
-# # corr_clustr_venn('female_drivers_in_gambranch')
-# options(repr.plot.width=7, repr.plot.height=7)
-```
-
-```{r}
-##All gambracch independently
-corr_clustr_venn(corr_stage1 = 'di.*l__in', corr_stage2 = 'dir_all_d.*l_in', sufx='ness')
-```
 
 
 ```{r}
@@ -1273,29 +848,11 @@ lst<- list(
 ```
 
 
-```{r}
-##CDB (anti-)correlation
-##Assess the overlap between genes based on correlation (or anti-correlation) in CDB to either femaleness or maleness in BF2
-
-corr_clustr_venn_flex(tbl1 = dr_gns_all, 
-                 tbl2 = dr_gns_all, 
-                 tbl3 = dr_gns_all, 
-                 tbl4 = dr_gns_all, 
-                 dir1 = 'correlated', 
-                 dir2 = 'anti-correlated', 
-                 dir3 = 'correlated', 
-                 dir4 = 'anti-correlated', 
-                 corr_stage1 = 'dir_al.*_female_in_CDB', 
-                 corr_stage2 = 'dir_al.*_female_in_CDB', 
-                 corr_stage3 = 'dir_al.*_male_in_CDB', 
-                 corr_stage4 ='dir_al.*_male_in_CDB', 
-                 sufx='ness',
-                 prefx='')
-```
 
 
 ```{r}
-##PK vs stocha CDB corr
+##BF2
+##PK vs stocha  corr
 corr_clustr_venn_flex(tbl1 = stocha_pk_gns, 
                  tbl2 = stocha_pk_gns, 
                  tbl3 = stocha_pk_gns, 
@@ -1310,8 +867,7 @@ corr_clustr_venn_flex(tbl1 = stocha_pk_gns,
                  corr_stage4 ='d.*_male_pk', 
                  sufx='ness',
                  prefx='PK ')
-```
-```{r}
+
 ##PK vs stocha CDB anti-corr
 corr_clustr_venn_flex(tbl1 = stocha_pk_gns, 
                  tbl2 = stocha_pk_gns, 
@@ -1327,11 +883,31 @@ corr_clustr_venn_flex(tbl1 = stocha_pk_gns,
                  corr_stage4 ='d.*_male_pk', 
                  sufx='ness',
                  prefx='PK ')
+
+
 ```
 
 
+
 ```{r}
-##PK vs stocha gambranch anti-corr cells correlation only
+##BF1
+##PK vs stocha corr cells correlation only
+corr_clustr_venn_flex(tbl1 = stocha_pk_gns, 
+                 tbl2 = stocha_pk_gns, 
+                 tbl3 = stocha_pk_gns, 
+                 tbl4 = stocha_pk_gns, 
+                 dir1 = 'correlated', 
+                 dir2 = 'correlated', 
+                 dir3 = 'correlated', 
+                 dir4 = 'correlated', 
+                 corr_stage1 = 'd.*_gametocyte_vkck', 
+                 corr_stage2 = 'd.*_gametocyte_pk', 
+                 corr_stage3 = 'd.*_asexual_vkck', 
+                 corr_stage4 ='d.*_asexual_pk', 
+                 sufx='ness',
+                 prefx='PK ')
+
+##PK vs stocha  anti-corr cells correlation only
 corr_clustr_venn_flex(tbl1 = stocha_pk_gns, 
                  tbl2 = stocha_pk_gns, 
                  tbl3 = stocha_pk_gns, 
@@ -1350,139 +926,24 @@ corr_clustr_venn_flex(tbl1 = stocha_pk_gns,
 
 
 ```{r}
-##PK vs stocha gambranch anti-corr cells correlation only
-corr_clustr_venn_flex(tbl1 = stocha_pk_gns, 
-                 tbl2 = stocha_pk_gns, 
-                 tbl3 = stocha_pk_gns, 
-                 tbl4 = stocha_pk_gns, 
-                 dir1 = 'correlated', 
-                 dir2 = 'correlated', 
-                 dir3 = 'correlated', 
-                 dir4 = 'correlated', 
-                 corr_stage1 = 'd.*_gametocyte_vkck', 
-                 corr_stage2 = 'd.*_gametocyte_pk', 
-                 corr_stage3 = 'd.*_asexual_vkck', 
-                 corr_stage4 ='d.*_asexual_pk', 
-                 sufx='ness',
-                 prefx='PK ')
-```
-
-```{r}
-##ALL DAYS VS All DAYS n cells correlation only
+##BF1&2
+##All DAYS anti-corr
 corr_clustr_venn_flex(tbl1 = stocha_gns, 
                  tbl2 = stocha_gns, 
                  tbl3 = stocha_gns, 
                  tbl4 = stocha_gns, 
-                 dir1 = 'correlated', 
-                 dir2 = 'correlated', 
-                 dir3 = 'correlated', 
-                 dir4 = 'correlated', 
-                 corr_stage1 = 'dir_all_d.*_female_in_', 
-                 corr_stage2 = 'di.*l_female_in_', 
-                 corr_stage3 = 'dir_all_d.*_male_in_', 
-                 corr_stage4 ='di.*l_male_in_', 
-                 sufx='ness',
-                 prefx='all ')
-```
-
-
-```{r}
-##All DAYS VS BF2 positive correlation
-corr_clustr_venn_flex(tbl1 = stocha_gns, 
-                 tbl2 = dr_gns_all, 
-                 tbl3 = stocha_gns, 
-                 tbl4 = dr_gns_all, 
-                 dir1 = 'correlated', 
-                 dir2 = 'correlated', 
-                 dir3 = 'correlated', 
-                 dir4 = 'correlated', 
-                 corr_stage1 = 'dir_all_d.*_female_in_', 
-                 corr_stage2 = 'dir_all_d.*_female_in_', 
-                 corr_stage3 = 'dir_all_d.*_male_in_', 
-                 corr_stage4 ='dir_all_d.*_male_in_', 
-                 sufx='ness',
-                 prefx='BF2 ')
-```
-
-```{r}
-##All DAYS VS BF2 negative correlation
-corr_clustr_venn_flex(tbl1 = stocha_gns, 
-                 tbl2 = dr_gns_all, 
-                 tbl3 = stocha_gns, 
-                 tbl4 = dr_gns_all, 
                  dir1 = 'anti-correlated', 
                  dir2 = 'anti-correlated', 
                  dir3 = 'anti-correlated', 
                  dir4 = 'anti-correlated', 
-                 corr_stage1 = 'dir_all_d.*_female_in_', 
-                 corr_stage2 = 'dir_all_d.*_female_in_', 
-                 corr_stage3 = 'dir_all_d.*_male_in_', 
-                 corr_stage4 ='dir_all_d.*_male_in_', 
-                 sufx='ness',
-                 prefx='BF2 ')
-```
-
-
-
-```{r}
-##BFcombi positive VS BF2 negative correlation 
-corr_clustr_venn_flex(tbl1 = stocha_gns, 
-                 tbl2 = dr_gns_all, 
-                 tbl3 = stocha_gns, 
-                 tbl4 = dr_gns_all, 
-                 dir1 = 'correlated', 
-                 dir2 = 'anti-correlated', 
-                 dir3 = 'correlated', 
-                 dir4 = 'anti-correlated', 
-                 corr_stage1 = 'dir_all_d.*_female_in_', 
-                 corr_stage2 = 'dir_all_d.*_female_in_', 
-                 corr_stage3 = 'dir_all_d.*_male_in_', 
-                 corr_stage4 ='dir_all_d.*_male_in_', 
-                 sufx='ness',
-                 prefx='BF2 ')
-```
-
-
-```{r}
-##BFcombi negative VS BF2 positive correlation 
-corr_clustr_venn_flex(tbl1 = stocha_gns, 
-                 tbl2 = dr_gns_all, 
-                 tbl3 = stocha_gns, 
-                 tbl4 = dr_gns_all, 
-                 dir1 = 'anti-correlated', 
-                 dir2 = 'correlated', 
-                 dir3 = 'anti-correlated', 
-                 dir4 = 'correlated', 
-                 corr_stage1 = 'dir_all_d.*_female_in_', 
-                 corr_stage2 = 'dir_all_d.*_female_in_', 
-                 corr_stage3 = 'dir_all_d.*_male_in_', 
-                 corr_stage4 ='dir_all_d.*_male_in_', 
-                 sufx='ness',
-                 prefx='BF2 ')
-```
-
-
-```{r}
-##All DAYS cdb lret
-corr_clustr_venn_flex(tbl1 = stocha_gns, 
-                 tbl2 = stocha_gns, 
-                 tbl3 = stocha_gns, 
-                 tbl4 = stocha_gns, 
-                 dir1 = 'correlated', 
-                 dir2 = 'correlated', 
-                 dir3 = 'correlated', 
-                 dir4 = 'correlated', 
-                 corr_stage1 = 'dir_all_d.*_female_in_CDB', 
-                 corr_stage2 = 'dir_all_d.*_male_in_CDB', 
-                 corr_stage3 = 'dir_all_d.*_asexual_in_', 
-                 corr_stage4 ='dir_all_d.*_gametocyte_in_', 
+                 corr_stage1 = 'dir_all_d.*_female_in_gambranch', 
+                 corr_stage2 = 'dir_all_d.*_male_in_gambranch', 
+                 corr_stage3 = 'dir_all_d.*_asexual_in', 
+                 corr_stage4 ='dir_all_d.*_gametocyte_in', 
                  sufx='ness',
                  prefx='')
-```
 
-
-```{r}
-##All DAYS gambranch lret
+##All DAYS corr
 corr_clustr_venn_flex(tbl1 = stocha_gns, 
                  tbl2 = stocha_gns, 
                  tbl3 = stocha_gns, 
@@ -1493,88 +954,11 @@ corr_clustr_venn_flex(tbl1 = stocha_gns,
                  dir4 = 'correlated', 
                  corr_stage1 = 'dir_all_d.*_female_in_gambranch', 
                  corr_stage2 = 'dir_all_d.*_male_in_gambranch', 
-                 corr_stage3 = 'dir_all_d.*_asexual_in_', 
-                 corr_stage4 ='dir_all_d.*_gametocyte_in_', 
+                 corr_stage3 = 'dir_all_d.*_asexual_in', 
+                 corr_stage4 ='dir_all_d.*_gametocyte_in', 
                  sufx='ness',
                  prefx='')
 ```
-
-```{r}
-##BFcombi negative VS BF2 positive correlation 
-corr_clustr_venn_flex(tbl1 = stocha_gns, 
-                 tbl2 = dr_gns_all, 
-                 tbl3 = stocha_gns, 
-                 tbl4 = dr_gns_all, 
-                 dir1 = 'anti-correlated', 
-                 dir2 = 'correlated', 
-                 dir3 = 'anti-correlated', 
-                 dir4 = 'correlated', 
-                 corr_stage1 = 'dir_all_d.*_female_in_', 
-                 corr_stage2 = 'dir_all_d.*_female_in_', 
-                 corr_stage3 = 'dir_all_d.*_male_in_', 
-                 corr_stage4 ='dir_all_d.*_male_in_', 
-                 sufx='ness',
-                 prefx='BF2 ')
-```
-
-
-```{r}
-##ALL & All DAYS gambranch CDB positive
-corr_clustr_venn_flex(tbl1 = stocha_gns, 
-                 tbl2 = stocha_gns, 
-                 tbl3 = stocha_gns, 
-                 tbl4 = stocha_gns, 
-                 dir1 = 'correlated', 
-                 dir2 = 'correlated', 
-                 dir3 = 'correlated', 
-                 dir4 = 'correlated', 
-                 corr_stage1 = 'dir_a.*_female_in_CDB', 
-                 corr_stage2 = 'dir_a.*_female_in_gambranch', 
-                 corr_stage3 = 'dir_a.*_male_in_CDB', 
-                 corr_stage4 = 'dir_a.*_male_in_gambranch', 
-                 sufx='ness',
-                 prefx='gambranch ')
-```
-
-
-```{r}
-##All DAYS gambranch CDB positive
-corr_clustr_venn_flex(tbl1 = stocha_gns, 
-                 tbl2 = stocha_gns, 
-                 tbl3 = stocha_gns, 
-                 tbl4 = stocha_gns, 
-                 dir1 = 'correlated', 
-                 dir2 = 'correlated', 
-                 dir3 = 'correlated', 
-                 dir4 = 'correlated', 
-                 corr_stage1 = 'dir_all_d.*_female_in_CDB', 
-                 corr_stage2 = 'dir_all_d.*_female_in_gambranch', 
-                 corr_stage3 = 'dir_all_d.*_male_in_CDB', 
-                 corr_stage4 = 'dir_all_d.*_male_in_gambranch', 
-                 sufx='ness',
-                 prefx='gambranch ')
-```
-
-
-
-```{r}
-##all gambranch CDB positive
-corr_clustr_venn_flex(tbl1 = stocha_gns, 
-                 tbl2 = stocha_gns, 
-                 tbl3 = stocha_gns, 
-                 tbl4 = stocha_gns, 
-                 dir1 = 'correlated', 
-                 dir2 = 'correlated', 
-                 dir3 = 'correlated', 
-                 dir4 = 'correlated', 
-                 corr_stage1 = 'di.*l_female_in_CDB', 
-                 corr_stage2 = 'di.*l_female_in_gambranch', 
-                 corr_stage3 = 'di.*l_male_in_CDB', 
-                 corr_stage4 = 'di.*l_male_in_gambranch', 
-                 sufx='ness',
-                 prefx='gambranch ')
-```
-
 
 
 ```{r}
@@ -1582,17 +966,16 @@ api_ap2 <- c('PF3D7_1222600','PF3D7_1429200', 'PF3D7_0404100','PF3D7_1350900','P
 ```
 
 ```{r}
-stocha_gns %>% filter(ID %in% api_ap2)
-```
-
-```{r}
-stocha_corr_genes %>% map(. %>% filter(ID %in% c('PF3D7_0611200','PF3D7_0613800','PF3D7_0802100','PF3D7_1449500','PF3D7_1456000') & qval<0.001 & Timepoint=='all_days'))
+stocha_pk_gns%>% filter(ID %in% api_ap2)
 ```
 
 ```{r}
 candidate_published_gns <- toupper(c('PF3D7_1247800', 'PF3D7_1401900','PF3D7_0404100', 'PF3D7_0516800', 'PF3D7_1429200', 'PF3D7_1315800', 'PF3D7_0603600', 'PF3D7_1241400', 'PF3D7_0715100', 'pf3d7_1250100', 'pf3d7_1031000', 'pf3d7_1475500', 'pf3d7_1455800', 'pf3d7_1407000', 'pf3d7_0903800', 'pf3d7_0918700', 'pf3d7_0730400', 'pf3d7_1007800', 'pf3d7_1466800', 'pf3d7_1146800', 'pf3d7_1214800'))
 ```
 
+```{r}
+stocha_pk_gns %>% filter(ID %in% candidate_published_gns)
+```
 
 ```{r, eval=FALSE}
 system(
@@ -1605,23 +988,12 @@ VBcomplete_transcriptome <- readxl::read_excel("data/raw/published/12864_2019_63
 ```
 
 ```{r}
-head(VBcomplete_transcriptome)
-```
-
-```{r}
 VBgam_vs_asexual <- readxl::read_excel("data/raw/published/12864_2019_6322_MOESM2_ESM.xlsx", sheet = "Gametocyte vs asexual hyb.", skip = 3)
 ```
 
-```{r}
-head(VBgam_vs_asexual)
-```
 
 ```{r}
 VBpublished_gam_markers <- readxl::read_excel("data/raw/published/12864_2019_6322_MOESM2_ESM.xlsx", sheet = "Published gametocyte markers", skip = 1)
-```
-
-```{r}
-head(VBpublished_gam_markers)
 ```
 
 ```{r}
@@ -1638,79 +1010,46 @@ mutate(across(everything(), ~str_replace(.,'√', 'Yes'))) %>%
 ```
 
 ```{r}
-VBreg_functional %>% glimpse
-```
-
-```{r}
-# stocha_dr_gns_VB_cluster <- stocha_gns %>% 
-# left_join(., (VBreg_functional %>% dplyr::select(ID, 'Cluster')) , by = c('Gene ID' ='Gene ID')) %>% 
-# column_to_rownames('Gene ID')%>%
-# mutate(CDgam_all_days = case_when(str_detect(female_drivers_in_CDB, 'all_days') | str_detect(male_drivers_in_CDB, 'all_days') ~ 'Yes',
-#                                       !is.na(female_drivers_in_CDB) | !is.na(male_drivers_in_CDB) ~ 'No'
-#                                      ),
-#        Bgam_all_days = case_when(str_detect(female_drivers_in_gambranch, 'all_days') | str_detect(male_drivers_in_gambranch, 'all_days') ~ 'Yes',
-#                                       !is.na(female_drivers_in_gambranch) | !is.na(male_drivers_in_gambranch) ~ 'No'
-#                                      ),
-#        CDgam_all = case_when(str_detect(female_drivers_in_CDB, 'all$') | str_detect(male_drivers_in_CDB, 'all$') ~ 'Yes',
-#                                       !is.na(female_drivers_in_CDB) | !is.na(male_drivers_in_CDB) ~ 'No'
-#                                      ),
-#        Bgam_all = case_when(str_detect(female_drivers_in_gambranch, 'all$') | str_detect(male_drivers_in_gambranch, 'all$') ~ 'Yes',
-#                                       !is.na(female_drivers_in_gambranch) | !is.na(male_drivers_in_gambranch) ~ 'No'
-#                                      ),
-#        Gam_lReT_all_days = case_when(str_detect(early_gam_drivers_in_lReT, 'all_days') ~ 'Yes',
-#                                       !is.na(early_gam_drivers_in_lReT) ~ 'No'
-#                                      ),
-#        Gam_lReT_all = case_when(str_detect(early_gam_drivers_in_lReT, 'all$') ~ 'Yes',
-#                                       !is.na(early_gam_drivers_in_lReT) ~ 'No'
-#                                      )
-#       ) 
-```
-
-```{r}
-stocha_dr_gns_VB_cluster <- stocha_gns %>% 
+stocha_dr_gns_VB_cluster <- stocha_pk_gns %>% 
 left_join(., (VBreg_functional %>% dplyr::select(ID, 'Cluster')) , by = 'ID') %>% 
 column_to_rownames('ID')
 ```
 
-
 ```{r}
-VBreg_functional %>% colnames
-```
-
-```{r}
+##BF2
 VBgam_vs_asexual %>% 
-filter(`PlasmoDB ID` %in% (stocha_gns %>% filter(if_any(matches('dir.*ale_in_CDB'), ~.== 'correlated') )  %>% pull(ID))) %>%
+filter(`PlasmoDB ID` %in% (stocha_pk_gns %>% filter(!is.na(Bgam_sex_stocha_VKCK)|!is.na(Bgam_sex_PK))  %>% pull(ID))) %>%
 dplyr::select(`PlasmoDB ID`, starts_with('Day')) %>% 
 column_to_rownames("PlasmoDB ID") %>%
 as.matrix() %>%
 pheatmap(., 
          cluster_cols = F,
          show_rownames = F,
-         annotation_row = stocha_gns %>% filter(if_any(matches('dir.*ale_in_CDB'), ~.== 'correlated') )  %>% column_to_rownames('ID') %>% dplyr::select(CDgam_sex))
-```
-
-```{r}
-stocha_dr_gns_VB_cluster %>% filter(if_any(matches('dir_all_d.*ale_in_CDB'), ~.== 'correlated') )
+         annotation_row = stocha_pk_gns %>% filter(!is.na(Bgam_sex_stocha_VKCK)|!is.na(Bgam_sex_PK))  %>% column_to_rownames('ID') %>% mutate(annot= coalesce(Bgam_sex_stocha_VKCK,Bgam_sex_PK)) %>% dplyr::select(annot))
 ```
 
 
+```{r}
+stocha_pk_gns %>% filter(!is.na(Bgam_sex_stocha_VKCK)|!is.na(Bgam_sex_PK))
+```
 
 ```{r}
+##BF1
 VBgam_vs_asexual %>% 
-filter(`PlasmoDB ID` %in% (stocha_gns %>% filter(if_any(matches('dir.*ale_in_gambranch'), ~.== 'correlated') )  %>% pull(ID))) %>%
+filter(`PlasmoDB ID` %in% (stocha_pk_gns %>% filter(!is.na(Asex_gam_stocha_VKCK)|!is.na(Asex_gam_PK))  %>% pull(ID))) %>%
 dplyr::select(`PlasmoDB ID`, starts_with('Day')) %>% 
 column_to_rownames("PlasmoDB ID") %>%
 as.matrix() %>%
 pheatmap(., 
-         cluster_cols = F, 
+         cluster_cols = F,
          show_rownames = F,
-         annotation_row = stocha_gns %>% filter(if_any(matches('dir.*ale_in_gambranch'), ~.== 'correlated') )  %>% column_to_rownames('ID') %>% dplyr::select(Bgam_sex))
+         annotation_row = stocha_pk_gns %>% filter(!is.na(Asex_gam_stocha_VKCK)|!is.na(Asex_gam_PK))  %>% column_to_rownames('ID') %>% mutate(annot= coalesce(Asex_gam_stocha_VKCK,Asex_gam_PK)) %>% dplyr::select(annot))
 ```
 
 
 ```{r}
 VBgam_vs_asexual %>% 
-filter(`PlasmoDB ID` %in% (stocha_gns %>% filter(if_any(matches('dir_all_d.*_female_in_gambranch'), ~.== 'correlated') ) %>% pull(ID))) %>% 
+filter(`PlasmoDB ID` %in% (stocha_pk_gns %>% filter(Bgam_sex_stocha_VKCK == 'Female')  %>% pull(ID))) %>% 
 pivot_longer(cols = starts_with('Day'), names_to = 'Days') %>% 
 mutate(across(c('Days'), ~factor(.,levels = VBgam_vs_asexual %>% select(starts_with('Day')) %>% colnames()))) %>%
 # group_by(`PlasmoDB ID`) %>%
@@ -1724,7 +1063,7 @@ theme(legend.position = "none")
 
 ```{r}
 VBgam_vs_asexual %>% 
-filter(`PlasmoDB ID` %in% (stocha_gns %>% filter(if_any(matches('dir_all_d.*_male_in_gambranch'), ~.== 'correlated') ) %>% pull(ID))) %>% 
+filter(`PlasmoDB ID` %in% (stocha_pk_gns %>% filter(Bgam_sex_stocha_VKCK == 'Male')  %>% pull(ID))) %>% 
 pivot_longer(cols = starts_with('Day'), names_to = 'Days') %>% 
 mutate(across(c('Days'), ~factor(.,levels = VBgam_vs_asexual %>% select(starts_with('Day')) %>% colnames()))) %>%
 # group_by(`PlasmoDB ID`) %>%
@@ -1738,7 +1077,7 @@ theme(legend.position = "none")
 
 ```{r}
 VBgam_vs_asexual %>% 
-filter(`PlasmoDB ID` %in% (stocha_gns %>% filter(if_any(matches('dir_all_d.*_male_in_gambranch'), ~.== 'anti-correlated') ) %>% pull(ID))) %>% 
+filter(`PlasmoDB ID` %in% (stocha_pk_gns %>% filter(Asex_gam_stocha_VKCK == 'Gametocyte')  %>% pull(ID))) %>% 
 pivot_longer(cols = starts_with('Day'), names_to = 'Days') %>% 
 mutate(across(c('Days'), ~factor(.,levels = VBgam_vs_asexual %>% select(starts_with('Day')) %>% colnames()))) %>%
 # group_by(`PlasmoDB ID`) %>%
@@ -1749,37 +1088,6 @@ geom_line() +
 # geom_smooth(aes(x = Days,  y = value, group = `PlasmoDB ID`, color = `PlasmoDB ID`), method = "gam", se = FALSE) + 
 theme(legend.position = "none") 
 ```
-
-```{r}
-VBgam_vs_asexual %>% 
-filter(`PlasmoDB ID` %in% (stocha_gns %>% filter(if_any(matches('dir_all_d.*_gametocyte_in_lReT'), ~.== 'correlated') ) %>% filter(if_any(matches('dir_all_d.*_asexual_in_lReT'), ~.== 'anti-correlated') ) %>% pull(ID))) %>% 
-pivot_longer(cols = starts_with('Day'), names_to = 'Days') %>% 
-mutate(across(c('Days'), ~factor(.,levels = VBgam_vs_asexual %>% select(starts_with('Day')) %>% colnames()))) %>%
-# group_by(`PlasmoDB ID`) %>%
-ggplot(., aes(x = Days,  y = value, group = `PlasmoDB ID`, color = `PlasmoDB ID`)) + 
-geom_point() + 
-geom_line() + 
-# stat_smooth(aes(x = Days,  y = value, group = `PlasmoDB ID`, color = `PlasmoDB ID`), method = "lm", se = FALSE) +
-# geom_smooth(aes(x = Days,  y = value, group = `PlasmoDB ID`, color = `PlasmoDB ID`), method = "gam", se = FALSE) + 
-theme(legend.position = "none") 
-```
-
-```{r}
-VBgam_vs_asexual %>% 
-filter(`PlasmoDB ID` %in% (stocha_gns %>% filter(if_any(matches('dir_all_d.*_gametocyte_in_lReT'), ~.== 'anti-correlated') ) %>% filter(if_any(matches('dir_all_d.*_asexual_in_lReT'), ~.== 'correlated') ) %>% pull(ID))) %>% 
-pivot_longer(cols = starts_with('Day'), names_to = 'Days') %>% 
-mutate(across(c('Days'), ~factor(.,levels = VBgam_vs_asexual %>% select(starts_with('Day')) %>% colnames()))) %>%
-# group_by(`PlasmoDB ID`) %>%
-ggplot(., aes(x = Days,  y = value, group = `PlasmoDB ID`, color = `PlasmoDB ID`)) + 
-geom_point() + 
-geom_line() + 
-# stat_smooth(aes(x = Days,  y = value, group = `PlasmoDB ID`, color = `PlasmoDB ID`), method = "lm", se = FALSE) +
-# geom_smooth(aes(x = Days,  y = value, group = `PlasmoDB ID`, color = `PlasmoDB ID`), method = "gam", se = FALSE) + 
-theme(legend.position = "none") 
-```
-
-
-
 
 
 ```{r}
@@ -1794,44 +1102,26 @@ mutate('Lasonder transcript sex bias' = case_when(`Female transcripts` == 'Yes' 
                                         `Female proteins` == 'Yes' & is.na(`Male Proteins`) ~ 'Female',
                                         is.na(`Female proteins`) & `Male Proteins` == 'Yes' ~ 'Male',
                                         is.na(`Female proteins`) & is.na(`Male Proteins`) ~ 'None')) %>%
-right_join(., stocha_gns %>% filter(if_any(matches('dir_all_d.*ale_in_CDB'), ~.== 'correlated') ) , by='ID')
+right_join(., stocha_pk_gns , by='ID')
 ```
 
 ```{r}
-TraProt_bias_CDB %>%
-dplyr::count(`Lasonder transcript sex bias`, CDgam_sex) %>%
-ggplot(., aes(x = `Lasonder transcript sex bias`, y = n, fill = CDgam_sex)) +
+TraProt_bias_CDB %>% filter(!is.na(Bgam_sex_stocha_VKCK)) %>%
+dplyr::count(`Lasonder transcript sex bias`, Bgam_sex_stocha_VKCK) %>%
+ggplot(., aes(x = `Lasonder transcript sex bias`, y = n, fill = Bgam_sex_stocha_VKCK)) +
 geom_col(position = position_dodge2(preserve = 'single'))
 ```
 
 ```{r}
-TraProt_bias_CDB %>%
-dplyr::count(`Tao protein sex bias`, CDgam_sex) %>%
-ggplot(., aes(x = `Tao protein sex bias`, y = n, fill = CDgam_sex)) +
+TraProt_bias_CDB %>% filter(!is.na(Bgam_sex_stocha_VKCK)) %>%
+dplyr::count(`Tao protein sex bias`, Bgam_sex_stocha_VKCK) %>%
+ggplot(., aes(x = `Tao protein sex bias`, y = n, fill = Bgam_sex_stocha_VKCK)) +
 geom_col(position = position_dodge2(preserve = 'single'))
 ```
 
-```{r}
-TraProt_bias_gambranch <- VBreg_functional %>% 
-dplyr::select('ID','Female transcripts', 'Male transcripts', 'Female proteins', 'Male Proteins') %>%
-dplyr::filter(if_any(-c('ID'), ~ !is.na(.))) %>%
-mutate('Lasonder transcript sex bias' = case_when(`Female transcripts` == 'Yes'  & `Male transcripts` == 'Yes' ~ 'Both',
-                                        `Female transcripts` == 'Yes' & is.na(`Male transcripts`) ~ 'Female',
-                                        is.na(`Female transcripts`) & `Male transcripts` == 'Yes' ~ 'Male',
-                                        is.na(`Female transcripts`) & is.na(`Male transcripts`) ~ 'None'),
-      'Tao protein sex bias' = case_when(`Female proteins` == 'Yes'  & `Male Proteins` == 'Yes' ~ 'Both',
-                                        `Female proteins` == 'Yes' & is.na(`Male Proteins`) ~ 'Female',
-                                        is.na(`Female proteins`) & `Male Proteins` == 'Yes' ~ 'Male',
-                                        is.na(`Female proteins`) & is.na(`Male Proteins`) ~ 'None')) %>%
-right_join(., stocha_gns %>% filter(if_any(matches('dir.*ale_in_gambranch'), ~.== 'correlated') ) , by='ID')
-```
 
 ```{r}
-VBreg_functional %>% glimpse
-```
-
-```{r}
-stocha_dr_gns_VB <- stocha_gns %>% 
+stocha_dr_gns_VB <- stocha_pk_gns%>% 
 left_join(., VBreg_functional %>%
           dplyr::select(ID,`AP2-G`, AP2_PF3D7_0934400, AP2_PF3D7_0611200, AP2_PF3D7_1317200, AP2_PF3D7_0516800, `Male transcripts`, `Female transcripts`, `Male Proteins`, `Female proteins`, Cluster), 
           by=c('ID'='ID')) %>%
@@ -1845,10 +1135,6 @@ mutate('Lasonder transcript bias' = case_when(`Female transcripts` == 'Yes'  & `
                                         is.na(`Female proteins`) & is.na(`Male Proteins`) ~ 'None'))
 ```
 
-```{r}
-stocha_dr_gns_VB
-```
-
 
 ```{r}
 lowerfun <- function(data, mapping) {
@@ -1858,18 +1144,11 @@ lowerfun <- function(data, mapping) {
 }  
 ```
 
-```{r}
-stocha_dr_gns_VB %>% dplyr::select(ID, CDgam_sex, Bgam_sex, `Lasonder transcript bias`, `Tao protein bias`, Cluster)%>%
-mutate(across(c('CDgam_sex', 'Bgam_sex'), ~replace_na(.,'None') )) %>%
-    filter(!(Bgam_sex == 'Female,Male' | CDgam_sex == 'Female,Male' )) %>%
-dplyr::count(CDgam_sex, Bgam_sex)
-```
 
 ```{r}
 print(GGally::ggpairs(
-    stocha_dr_gns_VB %>% dplyr::select(ID, CDgam_sex, Bgam_sex, `Lasonder transcript bias`, `Tao protein bias`)%>%
-mutate(across(c('CDgam_sex', 'Bgam_sex'), ~replace_na(.,'None') )) %>%
-    filter(!(Bgam_sex == 'Female,Male' | CDgam_sex == 'Female,Male' )) %>%
+    stocha_dr_gns_VB %>% dplyr::select(ID, Bgam_sex_stocha_VKCK, `Lasonder transcript bias`, `Tao protein bias`)%>%
+mutate(across(c('Bgam_sex_stocha_VKCK'), ~replace_na(.,'None') )) %>%
     tibble::column_to_rownames("ID"),# %>%
     # lower = list(continuous = GGally::wrap(
     #     ggplot(data = data, mapping = mapping) +
@@ -1883,122 +1162,52 @@ mutate(across(c('CDgam_sex', 'Bgam_sex'), ~replace_na(.,'None') )) %>%
     
 ```
 
-```{r}
-print(GGally::ggpairs(
-    stocha_dr_gns_VB %>% dplyr::select(ID, CDgam_sex, Bgam_sex, `Lasonder transcript bias`, `Tao protein bias`, Cluster)%>%
-    # filter(CDgam_sex != 'Female,Male') %>%
-    tibble::column_to_rownames("ID"),# %>%
-    # lower = list(continuous = GGally::wrap(
-    #     ggplot(data = data, mapping = mapping) +
-    #     geom_point(size = 0.3, alpha = 0.3) +
-    #     geom_abline(slope = 1, intercept = 0, color = "blue")
-    # )),
-    title = paste0("Comparison "), 
-                          xlab = paste("comp")
-)
-      )
-    
-```
+
 
 ```{r}
-# print(GGally::ggpairs(stocha_corr_genes[[4]] %>%
-#                           filter(!is.na(`Gene ID`) & qval < 0.005 ) %>%
-#                             dplyr::select(Gene_ID, corr, Timepoint) %>%
-#                             pivot_wider(names_from = Timepoint, values_from = c('corr')) %>%
-#                             tibble::column_to_rownames("ID"),
-#                           # dplyr::mutate_all(.funs = log1p),
-#                           lower = list(continuous = GGally::wrap(
-#                                   ggplot(data = data, mapping = mapping) +
-#                                 geom_point(size = 0.3, alpha = 0.3) +
-#                                 geom_abline(slope = 1, intercept = 0, color = "blue")
-#                           )),
-#                           title = paste0("Comparison of vo counts between days"), 
-#                           xlab = paste("log(count + 1)")) +
-#           theme(strip.text = element_text(size = 8.75 - 0.25 * 1))
-#           )
-```
-
-```{r}
-TraProt_bias_gambranch %>% 
-dplyr::count(`Lasonder transcript sex bias`, Bgam_sex) %>%
-ggplot(., aes(x = `Lasonder transcript sex bias`, y = n, fill = Bgam_sex)) +
-geom_col(position = position_dodge2(preserve = 'single'))
-```
-
-```{r}
-TraProt_bias_gambranch %>% 
-dplyr::count(`Tao protein sex bias`, Bgam_sex) %>%
-ggplot(., aes(x = `Tao protein sex bias`, y = n, fill = Bgam_sex)) +
+##ALL_DAYS
+VBreg_functional %>% 
+right_join(., stocha_pk_gns %>% 
+           filter(!is.na(Bgam_sex_stocha_VKCK)), by='ID') %>%
+dplyr::count(Bgam_sex_stocha_VKCK, Cluster) %>%
+ggplot(., aes(x = Cluster, y = n, fill = Bgam_sex_stocha_VKCK)) +
 geom_col(position = position_dodge2(preserve = 'single'))
 ```
 
 ```{r}
 ##ALL_DAYS
 VBreg_functional %>% 
-right_join(., stocha_gns %>% 
-           filter(if_any(matches('dir_all_d.*ale_in_CDB'), ~.== 'correlated') ), by='ID') %>%
-dplyr::count(CDgam_sex, Cluster) %>%
-ggplot(., aes(x = Cluster, y = n, fill = CDgam_sex)) +
+right_join(., stocha_pk_gns %>% 
+           filter(!is.na(Asex_gam_stocha_VKCK)), by='ID') %>%
+dplyr::count(Asex_gam_stocha_VKCK, Cluster) %>%
+ggplot(., aes(x = Cluster, y = n, fill = Asex_gam_stocha_VKCK)) +
 geom_col(position = position_dodge2(preserve = 'single'))
 ```
 
-```{r}
-VBreg_functional %>% 
-right_join(., stocha_gns %>% filter(if_any(matches('dir.*ale_in_gambranch'), ~.== 'correlated') ) , by='ID') %>%
-dplyr::count(Bgam_sex_all_days, Cluster) %>%
-ggplot(., aes(x = Cluster, y = n, fill = Bgam_sex_all_days)) +
-geom_col(position = position_dodge2(preserve = 'single'))
-```
-
-```{r}
-VBreg_functional %>% 
-right_join(., stocha_gns , by='ID') %>%
-dplyr::count(Bgam_sex, Cluster) %>%
-ggplot(., aes(x = Cluster, y = n, fill = Bgam_sex)) +
-geom_col(position = position_dodge2(preserve = 'single'))
-```
-
-```{r}
-stocha_dr_gns_VB 
-```
 
 ```{r}
 stocha_dr_gns_VB %>% 
-filter(if_any(contains('drivers'), ~str_detect(.,'all_days'))) %>% 
-unite('Sex', CDgam_sex:Bgam_sex, na.rm = T)  %>%
-mutate(across(Sex, ~case_when(str_detect(., 'Female,Male|Male_Female|Female_Male') ~ 'Female,Male',
-                     str_detect(., 'Female') ~ 'Female',
-                     str_detect(., 'Male') ~ 'Male'))) %>%
-dplyr::count(Sex, Cluster,`Tao protein bias`,`Lasonder transcript bias`) %>%
-ggplot(., aes(x = Cluster, y = n, fill = Sex)) +
+filter(!is.na(Bgam_sex_stocha_VKCK)) %>%
+dplyr::count(Bgam_sex_stocha_VKCK, Cluster,`Tao protein bias`,`Lasonder transcript bias`) %>%
+ggplot(., aes(x = Cluster, y = n, fill = Bgam_sex_stocha_VKCK)) +
 geom_col(position = position_dodge2(preserve = 'single')) +
 facet_grid(`Lasonder transcript bias`~`Tao protein bias`)
 ```
 
 ```{r}
 stocha_dr_gns_VB %>% 
-filter(if_any(contains('drivers'), ~str_detect(.,'all_days'))) %>% 
-filter(CDgam_sex %in% c('Female','Male') | is.na(CDgam_sex)) %>%
-filter(Bgam_sex %in% c('Female','Male') | is.na(Bgam_sex)) %>%
-# unite('Sex', CDgam_sex:Bgam_sex, na.rm = T)  %>%
-# mutate(across(Sex, ~case_when(str_detect(., 'Female,Male|Male_Female|Female_Male') ~ 'Female,Male',
-#                      str_detect(., 'Female') ~ 'Female',
-#                      str_detect(., 'Male') ~ 'Male'))) %>%
-dplyr::count(CDgam_sex,Bgam_sex , Cluster,`Lasonder transcript bias`) %>%
+filter(!is.na(Bgam_sex_stocha_VKCK)) %>%
+dplyr::count(Bgam_sex_stocha_VKCK, Cluster,`Lasonder transcript bias`) %>%
 ggplot(., aes(x = Cluster, y = n, fill = `Lasonder transcript bias`)) +
 geom_col(position = position_dodge2(preserve = 'single')) +
-facet_grid(CDgam_sex~Bgam_sex)
+facet_grid(.~Bgam_sex_stocha_VKCK)
 ```
 
 ```{r}
 stocha_dr_gns_VB %>% 
-filter(if_any(contains('drivers'), ~str_detect(.,'all_days'))) %>% 
-unite('Sex', CDgam_sex:Bgam_sex, na.rm = T)  %>%
-mutate(across(Sex, ~case_when(str_detect(., 'Female,Male|Male_Female|Female_Male') ~ 'Female,Male',
-                     str_detect(., 'Female') ~ 'Female',
-                     str_detect(., 'Male') ~ 'Male'))) %>%
-dplyr::count(Sex, Cluster,`Lasonder transcript bias`) %>%
-ggplot(., aes(x = Cluster, y = n, fill = Sex)) +
+filter(!is.na(Bgam_sex_stocha_VKCK)) %>%
+dplyr::count(Bgam_sex_stocha_VKCK, Cluster,`Lasonder transcript bias`) %>%
+ggplot(., aes(x = Cluster, y = n, fill = Bgam_sex_stocha_VKCK)) +
 geom_col(position = position_dodge2(preserve = 'single')) +
 facet_grid(.~`Lasonder transcript bias`)
 ```
@@ -2006,47 +1215,23 @@ facet_grid(.~`Lasonder transcript bias`)
 
 
 ```{r}
-# stocha_dr_gns_VB %>% 
-# filter(if_any(contains('drivers'), ~str_detect(.,'all_days'))) %>% 
-# # filter(!is.na(CDgam_sex)) %>%
-# # unite('Sex', CDgam_sex:Bgam_sex, na.rm = T)  %>%
-# # mutate(across(Sex, ~case_when(str_detect(., 'Female,Male|Male_Female|Female_Male') ~ 'Female,Male',
-# #                      str_detect(., 'Female') ~ 'Female',
-# #                      str_detect(., 'Male') ~ 'Male'))) %>%
-# count(Sex, Cluster,`Tao protein bias`,`Lasonder transcript bias`) %>%
-# ggplot(., aes(x = Cluster, y = n, fill = Sex)) +
-# geom_col(position = position_dodge2(preserve = 'single')) +
-# facet_grid(`Lasonder transcript bias`~`Tao protein bias`)
-```
-
-```{r}
 stocha_dr_gns_VB %>% 
-unite('Sex', CDgam_sex:Bgam_sex, na.rm = T)  %>%
-mutate(across(Sex, ~case_when(str_detect(., 'Female,Male|Male_Female|Female_Male') ~ 'Female,Male',
-                     str_detect(., 'Female') ~ 'Female',
-                     str_detect(., 'Male') ~ 'Male'))) %>%
-dplyr::count(Sex, Cluster, ) %>%
-ggplot(., aes(x = Cluster, y = n, fill = Sex)) +
+filter(!is.na(Bgam_sex_stocha_VKCK)) %>%
+dplyr::count(Bgam_sex_stocha_VKCK, Cluster) %>%
+ggplot(., aes(x = Cluster, y = n, fill = Bgam_sex_stocha_VKCK)) +
 geom_col(position = position_dodge2(preserve = 'single'))
 ```
 
 ```{r}
 VBreg_functional %>% 
 filter(Cluster == '8') %>%
-left_join(., stocha_gns %>% filter(if_any(matches('dir.*ale_in_gambranch'), ~.== 'correlated') ) , by='ID') %>%
-dplyr::count(Bgam_sex, Cluster, `Male transcripts`) %>%
-ggplot(., aes(x = `Male transcripts`, y = n, fill = Bgam_sex)) +
+left_join(., stocha_pk_gns %>% 
+            filter(!is.na(Bgam_sex_stocha_VKCK)) , by='ID') %>%
+dplyr::count(Bgam_sex_stocha_VKCK, Cluster, `Male transcripts`) %>%
+ggplot(., aes(x = `Male transcripts`, y = n, fill = Bgam_sex_stocha_VKCK)) +
 geom_col(position = position_dodge2(preserve = 'single'))
 ```
 
-```{r}
-VBreg_functional %>% 
-filter(Cluster == '8') %>%
-left_join(., stocha_gns %>% filter(if_any(matches('dir_all_d.*ale_in_CDB'), ~.== 'correlated') ) , by='ID') %>%
-dplyr::count(CDgam_sex, Cluster, `Male transcripts`) %>%
-ggplot(., aes(x = `Male transcripts`, y = n, fill = CDgam_sex)) +
-geom_col(position = position_dodge2(preserve = 'single'))
-```
 
 ```{r}
 VBreg_functional %>% 
@@ -2058,130 +1243,58 @@ mutate(
         `Female transcripts` == 'Yes' & `Male transcripts` == 'Yes'~ 'Both',
 )) %>%
 filter(if_any(-c('ID'), ~!is.na(.))) %>%
-left_join(., stocha_gns %>% filter(if_any(matches('dir_all_d.*ale_in_CDB'), ~.== 'correlated') ) , by='ID')  %>%
-dplyr::count(`Transcript sex bias`, CDgam_sex) %>%
-ggplot(., aes(x = `Transcript sex bias`, y = n, fill = CDgam_sex)) +
+  left_join(., stocha_pk_gns %>% 
+            filter(!is.na(Bgam_sex_stocha_VKCK)) , by='ID') %>%
+dplyr::count(`Transcript sex bias`, Bgam_sex_stocha_VKCK) %>%
+ggplot(., aes(x = `Transcript sex bias`, y = n, fill = Bgam_sex_stocha_VKCK)) +
 geom_col(position = position_dodge2(preserve = 'single'))
+
+```
+
+
+```{r}
+VBreg_functional %>% 
+right_join(., stocha_pk_gns %>% filter(!is.na(Bgam_sex_stocha_VKCK)) , by='ID') %>%
+dplyr::select('ID','ATGTGTA motif','AGACA motif', 'Bgam_sex_stocha_VKCK') %>%
+dplyr::count(Bgam_sex_stocha_VKCK, `ATGTGTA motif`, `AGACA motif`) 
+```
+
+
+```{r}
+VBreg_functional %>% 
+right_join(., stocha_pk_gns %>% filter(!is.na(Bgam_sex_stocha_VKCK)) , by='ID') %>%
+dplyr::select('ID','Other motifs', 'Bgam_sex_stocha_VKCK') %>%
+dplyr::count(Bgam_sex_stocha_VKCK, `Other motifs`) 
 ```
 
 ```{r}
 VBreg_functional %>% 
-dplyr::select(ID, 'Male transcripts','Female transcripts') %>%
-mutate(
-    'Transcript sex bias' = case_when(
-        `Male transcripts` == 'Yes' & is.na(`Female transcripts`) ~ 'Male',
-        `Female transcripts` == 'Yes'& is.na(`Male transcripts`) ~ 'Female',
-        `Female transcripts` == 'Yes' & `Male transcripts` == 'Yes'~ 'Both',
-)) %>%
-filter(if_any(-c('ID'), ~!is.na(.))) %>%
-left_join(., stocha_gns %>% filter(if_any(matches('dir.*ale_in_gambranch'), ~.== 'correlated') ) , by='ID')  %>%
-dplyr::count(`Transcript sex bias`, Bgam_sex) %>%
-ggplot(., aes(x = `Transcript sex bias`, y = n, fill = Bgam_sex)) +
-geom_col(position = position_dodge2(preserve = 'single'))
-```
-
-```{r}
-stocha_gns %>% filter(if_any(matches('dir_all_d.*ale_in_CDB'), ~.== 'correlated') ) 
+right_join(., stocha_pk_gns %>% filter(!is.na(Bgam_sex_stocha_VKCK)) , by='ID') %>%
+dplyr::select('ID',Bgam_sex_stocha_VKCK, 'Stabilized transcripts') %>%
+dplyr::count(Bgam_sex_stocha_VKCK, `Stabilized transcripts`) 
 ```
 
 ```{r}
 VBreg_functional %>% 
-filter(Cluster == '8' & `Male transcripts` == 'Yes') %>%
-left_join(., stocha_gns %>% filter(if_any(matches('dir_all_d.*ale_in_CDB'), ~.== 'correlated') ) , by='ID') %>%
-dplyr::count(Bgam_sex, Cluster) %>%
-ggplot(., aes(x = Cluster, y = n, fill = Bgam_sex)) +
-geom_col(position = position_dodge2(preserve = 'single'))
-```
-
-```{r}
-# VB_early_list
-```
-
-```{r}
-# VBreg_functional %>% count(Cluster,`Male transcripts`)
-```
-
-```{r}
-VBreg_functional %>% 
-right_join(., stocha_gns %>% filter(if_any(matches('dir_all_d.*ale_in_CDB'), ~.== 'correlated') ) , by='ID') %>%
-dplyr::select('ID','ATGTGTA motif','AGACA motif', 'CDgam_sex') %>%
-dplyr::count(CDgam_sex, `ATGTGTA motif`, `AGACA motif`) 
-```
-
-```{r}
-VBreg_functional %>% 
-right_join(., stocha_gns %>% filter(if_any(matches('dir.*ale_in_gambranch'), ~.== 'correlated') ) , by='ID') %>%
-dplyr::select('ID','ATGTGTA motif','AGACA motif', 'Bgam_sex') %>%
-dplyr::count(Bgam_sex, `ATGTGTA motif`, `AGACA motif`) 
-```
-
-```{r}
-VBreg_functional %>% 
-right_join(., stocha_gns %>% filter(if_any(matches('dir.*ale_in_gambranch'), ~.== 'correlated') ) , by='ID') %>%
-dplyr::select('ID','Other motifs', 'Bgam_sex') %>%
-dplyr::count(Bgam_sex, `Other motifs`) 
-```
-
-```{r}
-VBreg_functional %>% 
-right_join(., stocha_gns %>% filter(if_any(matches('dir.*ale_in_gambranch'), ~.== 'correlated') ) , by='ID') %>%
-dplyr::select('ID',Bgam_sex, 'Stabilized transcripts') %>%
-dplyr::count(Bgam_sex, `Stabilized transcripts`) 
-```
-
-```{r}
-VBreg_functional %>% 
-right_join(., stocha_gns %>% filter(if_any(matches('dir.*ale_in_gambranch'), ~.== 'correlated') ) , by='ID') %>%
-dplyr::select('ID',Bgam_sex, starts_with('AP2')) %>%
+right_join(., stocha_pk_gns %>% filter(!is.na(Bgam_sex_stocha_VKCK)) , by='ID') %>%
+dplyr::select('ID',Bgam_sex_stocha_VKCK, starts_with('AP2')) %>%
 mutate(across(starts_with('AP2'), ~as.numeric(.))) %>%
 dplyr::filter(if_any(starts_with('AP2'), ~ !is.na(.))) 
 ```
 
 ```{r}
 VBreg_functional %>% 
-right_join(., stocha_gns %>% filter(if_any(matches('dir.*ale_in_gambranch'), ~.== 'correlated') ) , by='ID') %>%
-dplyr::select('ID',Bgam_sex, starts_with('AP2')) %>%
+right_join(., stocha_pk_gns %>% filter(!is.na(Asex_gam_stocha_VKCK)) , by='ID') %>%
+dplyr::select('ID',Asex_gam_stocha_VKCK, starts_with('AP2')) %>%
 mutate(across(starts_with('AP2'), ~as.numeric(.))) %>%
-dplyr::filter(if_any(starts_with('AP2'), ~ !is.na(.))) %>%
-ggplot(., aes(x= Bgam_sex, y = `AP2_PF3D7_0611200`)) +
-geom_boxplot()
+dplyr::filter(if_any(starts_with('AP2'), ~ !is.na(.))) 
 ```
 
-```{r}
-as.list(colnames(VBreg_functional)[VBreg_functional %>% colnames() %>% str_detect('Asex')])
-```
-
-```{r}
-# VBreg_functional %>% 
-# right_join(., stocha_gns %>% filter(if_any(matches('dir_all_d.*ale_in_CDB'), ~.== 'correlated') ) , by='ID') %>%
-# dplyr::select('Gene_ID',Sex, starts_with('As')) %>%
-# dplyr::filter(if_any(starts_with('As'), ~ !is.na(.))) %>%
-# map(as.list(colnames(VBreg_functional)[VBreg_functional %>% colnames() %>% str_detect('Asex')]), 
-#     ~ count(.data, Sex, .x) )
-```
-
-```{r}
-colnames(VBreg_functional)[VBreg_functional %>% colnames() %>% str_detect('Asex')]
-```
-
-```{r}
-# for (epi_marker in colnames(VBreg_functional)[VBreg_functional %>% colnames() %>% str_detect('Asex')]) {
-#     print(epi_marker)
-#     VBreg_functional %>% 
-#     right_join(., stocha_gns %>% filter(if_any(matches('dir_all_d.*ale_in_CDB'), ~.== 'correlated') ) , by='ID') %>%
-#     dplyr::select('Gene_ID',Sex, starts_with('As')) %>%
-#     dplyr::filter(if_any(starts_with('As'), ~ !is.na(.))) %>%
-#     count(Sex, !!epi_marker) %>%
-#     ggplot(., aes(x = !!epi_marker, y = n, fill = Sex)) +
-#     geom_col(position = position_dodge2(preserve = 'single'))
-# }
-    
-```
 
 ```{r}
 VBreg_functional %>% 
-right_join(., stocha_gns %>% filter(if_any(matches('dir_all_d.*ale_in_CDB'), ~.== 'correlated') ) , by='ID') %>%
-dplyr::select('ID',CDgam_sex, starts_with('As')) %>%
+right_join(., stocha_pk_gns %>% filter(!is.na(Bgam_sex_stocha_VKCK)) , by='ID') %>%
+dplyr::select('ID',Bgam_sex_stocha_VKCK, starts_with('As')) %>%
 dplyr::filter(if_any(starts_with('As'), ~ !is.na(.))) 
 # %>%
 # dplyr::select(-c(`Gene ID`)) %>% 
@@ -2190,11 +1303,11 @@ dplyr::filter(if_any(starts_with('As'), ~ !is.na(.)))
 
 ```{r}
 VBreg_functional %>% 
-right_join(., stocha_gns %>% filter(if_any(matches('dir_all_d.*ale_in_CDB'), ~.== 'correlated') ) , by='ID') %>%
-dplyr::select('ID',CDgam_sex, starts_with('As')) %>%
+right_join(., stocha_pk_gns %>% filter(!is.na(Bgam_sex_stocha_VKCK)) , by='ID') %>%
+dplyr::select('ID',Bgam_sex_stocha_VKCK, starts_with('As')) %>%
 dplyr::filter(if_any(starts_with('As'), ~ !is.na(.))) %>%
-dplyr::count(CDgam_sex, `Asex_Epi_H3K36me3`) %>%
-ggplot(., aes(x = `Asex_Epi_H3K36me3`, y = n, fill = CDgam_sex)) +
+dplyr::count(Bgam_sex_stocha_VKCK, `Asex_Epi_H3K36me3`) %>%
+ggplot(., aes(x = `Asex_Epi_H3K36me3`, y = n, fill = Bgam_sex_stocha_VKCK)) +
 geom_col(position = position_dodge2(preserve = 'single'))
 ```
 
@@ -2257,14 +1370,13 @@ fVSm <- FindMarkers(Road2UMAP, ident.1 = 'gametocyte (female)', ident.2 = 'gamet
 ```{r}
 ggvenn(
   list(VB_early = VBreg_functional %>% filter(Cluster == '8' & `Male transcripts` == 'Yes') %>% pull(ID),
-    male_dr_gambranch = stocha_gns %>% filter(if_any(matches('dir.*ale_in_gambranch'), ~.== 'correlated') )  %>% pull(ID) ,
-    male_dr_CDB = stocha_gns %>% filter(if_any(matches('dir_all_d.*ale_in_CDB'), ~.== 'correlated') )  %>% pull(ID) ,
+    male_dr = stocha_pk_gns %>% filter(Bgam_sex_stocha_VKCK == 'Male')  %>% pull(ID) ,
     male_upregulated = fVSm %>% filter(avg_log2FC<0) %>% rownames() %>% str_replace(., '-', '_')),
   fill_color = c("#0073C2FF", "#EFC000FF", "#868686FF", "#A46868"),
   stroke_size = 0.5, set_name_size = 4
   )
 ```
-
+##############################5th may 2022
 ```{r}
 fVSm
 ```
@@ -2317,35 +1429,11 @@ names(dr_sex_col) <- c('Male', 'Female', 'Female,Male', 'No bias')
 ```{r}
 dr_stage_col <- brewer.pal(4,"Set3")
 names(dr_stage_col) <- c('Asexual', 'Gametocyte', 'Asexual,Gametocyte', 'No bias')
+dr_stage_col2 <- brewer.pal(3,"Set2")[1:2]
+names(dr_stage_col2) <- c('Asexual', 'Gametocyte')
 ```
 
-```{r}
-lfVSlm %>% 
-mutate(SexDE = case_when(avg_log2FC > 0 ~ 'Female',
-                                        avg_log2FC < 0 ~ 'Male')) %>%
-rownames_to_column("gene_id") %>%
-mutate(across(gene_id, ~str_replace(., '-', '_') )) %>%
-right_join(., stocha_dr_gns_VB_cluster%>%
-            # filter(is.na(CDgam_sex) | CDgam_sex != 'Female,Male') %>%
-            # filter(is.na(Bgam_sex_all_days) | Bgam_sex_all_days != 'Female,Male')  %>% 
-           filter(if_any(matches('dir_all_d.*ale_in_gambranch'), ~.== 'correlated') ) %>% 
-           rownames_to_column('gene_id') , by='gene_id') %>% 
-dplyr::select(gene_id,p_val,avg_log2FC,pct.1,pct.2,p_val_adj,SexDE, CDgam_sex,Bgam_sex_all_days) %>%
-dplyr::count(SexDE, Bgam_sex_all_days) %>%
-mutate_if(is.character, ~replace_na(.,'Not DE')) %>%
-ggplot(., aes(x = SexDE, y = n, fill = Bgam_sex_all_days)) +
-# geom_col(position = position_dodge2(preserve = 'single')) +
-theme(axis.text=element_text(size=26), 
-      axis.title=element_text(size=30,face="bold"), 
-      legend.text = element_text(size=30), 
-      legend.title = element_text(size=30,face="bold")) + 
-rotate_x_text() +
-labs(x = "Sex DE", y = 'Counts') + 
-guides(fill=guide_legend(title="Sex correlation"))+ 
-geom_col(position = position_dodge2(width = 0.2)) +
-scale_fill_manual(values = dr_sex_col)+
-geom_text(aes(label = n), position = position_dodge2(width = 0.8), vjust =0.5, hjust =0.8, size =8, angle = 90)
-```
+
 
 ```{r}
 ##ALL DAYS Bgam
@@ -2354,15 +1442,12 @@ lfVSlm %>% mutate(SexDE = case_when(avg_log2FC > 0 ~ 'Female',
 rownames_to_column("gene_id") %>%
 mutate(across(gene_id, ~str_replace(., '-', '_') )) %>%
 right_join(., stocha_dr_gns_VB_cluster %>%
-            #filter(is.na(CDgam_sex) | CDgam_sex != 'Female,Male') %>%
-            filter(is.na(Bgam_sex) | Bgam_sex != 'Female,Male') %>%
-           filter(if_any(contains('drivers'), ~str_detect(.,'all_days'))) %>%
-           filter(if_any(matches('dir_all_d.*ale_in_gambranch'), ~.== 'correlated') ) %>% 
+           filter(!is.na(Bgam_sex_stocha_VKCK) ) %>% 
            rownames_to_column('gene_id') , by='gene_id') %>% 
-dplyr::select(gene_id,p_val,avg_log2FC,pct.1,pct.2,p_val_adj,SexDE, CDgam_sex,Bgam_sex) %>%
-dplyr::count(SexDE, Bgam_sex) %>%
+dplyr::select(gene_id,p_val,avg_log2FC,pct.1,pct.2,p_val_adj,SexDE,Bgam_sex_stocha_VKCK) %>%
+dplyr::count(SexDE, Bgam_sex_stocha_VKCK) %>%
 mutate_if(is.character, ~replace_na(.,'Not DE')) %>%
-ggplot(., aes(x = SexDE, y = n, fill = Bgam_sex)) +
+ggplot(., aes(x = SexDE, y = n, fill = Bgam_sex_stocha_VKCK)) +
 # geom_col(position = position_dodge2(preserve = 'single')) +
 theme(axis.text=element_text(size=26), 
       axis.title=element_text(size=30,face="bold"), 
@@ -2372,57 +1457,25 @@ rotate_x_text() +
 labs(x = "Sex DE", y = 'Counts') + 
 guides(fill=guide_legend(title="Sex \ncorrelation"))+ 
 geom_col(position = position_dodge2(width = 0.2)) +
-scale_fill_manual(values = dr_sex_col2)+
+scale_fill_manual(values = dr_stage_col)+
 geom_label(aes(label = n), position = position_dodge2(width = 01),size =8, angle = 90,colour = "white", fontface = "bold",show.legend = FALSE)
 ```
 
-```{r}
-##Non-ALL DAYS CD
-lfVSlm %>% mutate(SexDE = case_when(avg_log2FC > 0 ~ 'Female',
-                                        avg_log2FC < 0 ~ 'Male')) %>%
-rownames_to_column("gene_id")  %>%
-mutate(across(gene_id, ~str_replace(., '-', '_') )) %>%
-right_join(., stocha_dr_gns_VB_cluster %>%
-            # filter(is.na(CDgam_sex) | CDgam_sex != 'Female,Male') %>%
-            filter(is.na(Bgam_sex) | Bgam_sex != 'Female,Male') %>% 
-           filter(if_any(matches('dir_all_d.*ale_in_CDB'), ~.== 'correlated') ) %>% 
-           rownames_to_column('gene_id') , by='gene_id') %>% 
-dplyr::select(gene_id,p_val,avg_log2FC,pct.1,pct.2,p_val_adj,SexDE, CDgam_sex) %>%
-dplyr::count(SexDE, CDgam_sex) %>%
-mutate_if(is.character, ~replace_na(.,'Not DE')) %>%
-ggplot(., aes(x = SexDE, y = n, fill = CDgam_sex)) +
-# geom_col(position = position_dodge2(preserve = 'single'))+
-theme(axis.text=element_text(size=26), 
-      axis.title=element_text(size=30,face="bold"), 
-      legend.text = element_text(size=30), 
-      legend.title = element_text(size=30,face="bold")) + 
-rotate_x_text() +
-labs(x = "Sex DE", y = 'Counts') + 
-guides(fill=guide_legend(title="Sex correlation"))+ 
-geom_col(position = position_dodge2(width = 0.2)) +
-scale_fill_manual(values = dr_sex_col)+
-geom_text(aes(label = n), position = position_dodge2(width = 0.8), vjust =0.5, hjust =0.8, size =8, angle = 90)
-```
 
 ```{r}
-##ALL DAYS CD
+##BF1 
 lfVSlm %>% mutate(SexDE = case_when(avg_log2FC > 0 ~ 'Female',
                                         avg_log2FC < 0 ~ 'Male')) %>%
 rownames_to_column("gene_id") %>%
-full_join(., Pf3D7_genes_plasmoDB[,c("gene_id", "Product Description", "Computed GO Components", "Computed GO Functions", 
-"Computed GO Processes", "Curated GO Components", "Curated GO Functions", "Curated GO Processes")], by = "gene_id") %>%
 mutate(across(gene_id, ~str_replace(., '-', '_') )) %>%
 right_join(., stocha_dr_gns_VB_cluster %>%
-            #filter(is.na(CDgam_sex) | CDgam_sex != 'Female,Male') %>%
-            filter(is.na(Bgam_sex) | Bgam_sex != 'Female,Male') %>%
-           filter(if_any(contains('drivers'), ~str_detect(.,'all_days'))) %>% 
-           filter(if_any(matches('dir_all_d.*ale_in_CDB'), ~.== 'correlated') ) %>% 
+           filter(!is.na(Asex_gam_stocha_VKCK) ) %>% 
            rownames_to_column('gene_id') , by='gene_id') %>% 
-dplyr::select(gene_id,p_val,avg_log2FC,pct.1,pct.2,p_val_adj,SexDE, CDgam_sex) %>%
-dplyr::count(SexDE, CDgam_sex) %>%
+dplyr::select(gene_id,p_val,avg_log2FC,pct.1,pct.2,p_val_adj,SexDE,Asex_gam_stocha_VKCK) %>%
+dplyr::count(SexDE, Asex_gam_stocha_VKCK) %>%
 mutate_if(is.character, ~replace_na(.,'Not DE')) %>%
-ggplot(., aes(x = SexDE, y = n, fill = CDgam_sex)) +
-# geom_col(position = position_dodge2(preserve = 'single'))+
+ggplot(., aes(x = SexDE, y = n, fill = Asex_gam_stocha_VKCK)) +
+# geom_col(position = position_dodge2(preserve = 'single')) +
 theme(axis.text=element_text(size=26), 
       axis.title=element_text(size=30,face="bold"), 
       legend.text = element_text(size=30), 
@@ -2431,13 +1484,13 @@ rotate_x_text() +
 labs(x = "Sex DE", y = 'Counts') + 
 guides(fill=guide_legend(title="Sex \ncorrelation"))+ 
 geom_col(position = position_dodge2(width = 0.2)) +
-scale_fill_manual(values = dr_sex_col)+
+scale_fill_manual(values = dr_stage_col2)+
 geom_label(aes(label = n), position = position_dodge2(width = 01),size =8, angle = 90,colour = "white", fontface = "bold",show.legend = FALSE)
 ```
 
 ```{r}
 # VBreg_functional %>% 
-# right_join(., stocha_gns %>% filter(if_any(matches('dir_all_d.*ale_in_CDB'), ~.== 'correlated') ) , by='ID') %>%
+# right_join(., stocha_pk_gns %>% filter(!is.na(Bgam_sex_stocha_VKCK)) , by='ID') %>%
 # dplyr::select('ID',Bgam_sex, starts_with('As')) %>%
 # dplyr::filter(if_any(starts_with('As'), ~ !is.na(.))) %>%
 # dplyr::count(Bgam_sex, `Asex_Epi_H3K36me3`) %>%
@@ -2814,13 +1867,6 @@ column_to_rownames('barcode') %>%
 as.matrix()
 ```
 
-```{r}
-# sorted_gam_scale_data
-```
-
-```{r}
-# gams@meta.data %>% dplyr::select(anno_300cells) %>% unique %>% pull %>% dput
-```
 
 ```{r}
 gams_annot <- gams@meta.data %>% dplyr::select(anno_300cells)
@@ -2829,31 +1875,6 @@ male_asx_gams_annot <- male_asx_gams@meta.data %>% dplyr::select(stage_bfs)
 female_asx_gams_annot <- female_asx_gams@meta.data %>% dplyr::select(stage_bfs)
 ```
 
-```{r}
-# dr_days_CDB
-```
-
-```{r}
-# stocha_gns %>% filter(if_any(matches('dir_all_d.*ale_in_CDB'), ~.== 'correlated') )  %>% pull(ID)
-```
-
-```{r}
-# PfPDB_genes%>% 
-# filter(gene_id %in% (stocha_gns %>% filter(if_any(matches('dir_all_d.*ale_in_CDB'), ~.== 'correlated') )  %>% pull(ID))) %>% column_to_rownames('gene_id')
-```
-
-```{r}
-# gams_annot <- gams@meta.data %>% dplyr::select(anno_300cells)
-```
-
-```{r}
-# sorted_gam_scale_data_ffirst_bcodes_list[[1]]
-
-```
-
-```{r}
-# gams_list
-```
 
 ```{r}
 met.brewer(name="Archambault")
@@ -2877,58 +1898,11 @@ sorted_asx_gam_scale_data_ffirst_bcodes %>% dplyr::count(stage_bfs, phmap_colors
 female_sorted_asx_gam_scale_data_ffirst_bcodes %>% dplyr::count(stage_bfs, phmap_colors) %>% mutate_if(is.factor, as.character) %>% deframe
 ```
 
-```{r}
-##Bgam ALLDAYS
-```
 
 ```{r}
 ##ONLY ALL_DAYS
-# Bgam_annot <- stocha_gns %>%
-# # filter(if_any(contains('drivers'), ~str_detect(.,'all_days')))%>% 
-# #filter(is.na(CDgam_sex) | CDgam_sex != 'Female,Male') %>%
-# filter(is.na(Bgam_sex) | Bgam_sex != 'Female,Male') %>%
-# filter(if_any(matches('dir_all_d.*ale_in_gambranch'), ~.== 'correlated') ) %>%
-# left_join(., lfVSlm %>% 
-#           rownames_to_column("gene_id")  %>%
-#           mutate(SexDE = case_when(avg_log2FC > 0 ~ 'Female',
-#                                         avg_log2FC < 0 ~ 'Male'),
-#                 across(gene_id, ~str_replace(., '-', '_') )),
-#           by=c('ID'='gene_id')
-#           ) %>% 
-# mutate(across(SexDE, ~factor(replace_na(.,'Not DE'), levels = c('Female', 'Male', 'Not DE')))) %>%
-# column_to_rownames('ID') %>%
-# dplyr::select(Bgam_sex, SexDE) %>%
-# rename('Sex correlation' = Bgam_sex)
-```
-
-
-
-```{r}
-# stocha_dr_gns_VB %>%
-# filter(ID %in% rownames(Bgam_annot)) %>% 
-# filter(if_any(contains('drivers'), ~str_detect(.,'all_days'))) %>% 
-# unite('Sex', CDgam_sex:Bgam_sex, na.rm = T)  %>%
-# mutate(across(Sex, ~case_when(str_detect(., 'Female,Male|Male_Female|Female_Male') ~ 'Female,Male',
-#                      str_detect(., 'Female') ~ 'Female',
-#                      str_detect(., 'Male') ~ 'Male')))%>%
-# dplyr::count(Sex, Cluster,`Lasonder transcript bias`) %>%
-# ggplot(., aes(x = Cluster, y = n, fill = Sex)) +
-# geom_col(position = position_dodge2(preserve = 'single')) +
-# facet_grid(.~`Lasonder transcript bias`)
-```
-
-
-```{r}
-##CDgam ALLDAYS
-```
-
-```{r}
-##ONLY ALL_DAYS
-CDgam_annot <- stocha_gns %>%
-# filter(if_any(contains('drivers'), ~str_detect(.,'all_days')))%>% 
-#filter(is.na(CDgam_sex) | CDgam_sex != 'Female,Male') %>%
-# filter(is.na(Bgam_sex) | Bgam_sex != 'Female,Male') %>%
-filter(if_any(matches('dir_all_d.*ale_in_CDB'), ~.== 'correlated') ) %>%
+CDgam_annot <- stocha_pk_gns %>%
+filter(!is.na(Bgam_sex_stocha_VKCK)) %>%
 left_join(., lfVSlm %>% 
           rownames_to_column("gene_id")  %>%
           mutate(SexDE = case_when(avg_log2FC > 0 ~ 'Female',
@@ -2938,48 +1912,38 @@ left_join(., lfVSlm %>%
           ) %>% 
 mutate(across(SexDE, ~factor(replace_na(.,'Not DE'), levels = c('Female', 'Male', 'Not DE')))) %>%
 column_to_rownames('ID') %>%
-dplyr::select(CDgam_sex, SexDE) %>%
-rename('Sex correlation' = CDgam_sex)
+dplyr::select(Bgam_sex_stocha_VKCK, SexDE) %>%
+rename('Sex correlation' = Bgam_sex_stocha_VKCK)
 ```
 
 ```{r}
 ##ONLY ALL_DAYS
-asx_gam_annot <- stocha_gns%>% 
-    # filter(if_any(contains('drivers'), ~str_detect(.,'all_days')))%>% 
-  # filter(if_any(matches('dir_all_d.*gametocyte_in_lReT'), ~!is.na(.)) ) %>%
-  filter(!is.na(lR_eT_Asex_gam_all_days) & !is.na(lR_eT_Asex_gam_all_days_anti)) %>%
+asx_gam_annot <- stocha_pk_gns%>% 
+  filter(!is.na(Asex_gam_stocha_VKCK) & !is.na(Asex_gam_stocha_VKCK_anti)) %>%
     column_to_rownames('ID') %>% 
-    dplyr::select(lR_eT_Asex_gam_all_days, lR_eT_Asex_gam_all_days_anti) %>%
-    # mutate(across(lR_eT_Asex_gam, ~str_remove(.,'\\(schizont\\)'))) %>%
-    rename('Stage correlation' = lR_eT_Asex_gam_all_days, 'Stage anti-correlation' = lR_eT_Asex_gam_all_days_anti)
+    dplyr::select(Asex_gam_stocha_VKCK, Asex_gam_stocha_VKCK_anti) %>%
+    rename('Stage correlation' = Asex_gam_stocha_VKCK, 'Stage anti-correlation' = Asex_gam_stocha_VKCK_anti)
 ```
 
 ```{r}
 stocha_dr_gns_VB %>%
 filter(ID %in% rownames(CDgam_annot)) %>% 
-filter(if_any(contains('drivers'), ~str_detect(.,'all_days'))) %>% 
-unite('Sex', CDgam_sex:Bgam_sex, na.rm = T)  %>%
-mutate(across(Sex, ~case_when(str_detect(., 'Female,Male|Male_Female|Female_Male') ~ 'Female,Male',
-                     str_detect(., 'Female') ~ 'Female',
-                     str_detect(., 'Male') ~ 'Male')))%>%
-dplyr::count(Sex, Cluster,`Lasonder transcript bias`) %>%
-ggplot(., aes(x = Cluster, y = n, fill = Sex)) +
+filter(!is.na(Bgam_sex_stocha_VKCK))  %>%
+dplyr::count(Bgam_sex_stocha_VKCK, Cluster,`Lasonder transcript bias`) %>%
+ggplot(., aes(x = Cluster, y = n, fill = Bgam_sex_stocha_VKCK)) +
 geom_col(position = position_dodge2(preserve = 'single')) +
 facet_grid(.~`Lasonder transcript bias`)
 ```
 
 ```{r, fig.width= 12, fig.height=10}
 # options(repr.plot.width=12, repr.plot.height=5)
-sorted_gam_scale_data[stocha_gns %>% 
-                      # filter(if_any(contains('drivers'), ~str_detect(.,'all_days')))%>% 
-                      # filter(is.na(CDgam_sex) | CDgam_sex != 'Female,Male') %>%
-                      # filter(is.na(CDgam_sex) | Bgam_sex != 'Female,Male') %>% 
-                      filter(if_any(matches('dir_all_d.*ale_in_CDB'), ~.== 'correlated') ) %>% 
+sorted_gam_scale_data[stocha_pk_gns %>% 
+                      filter(!is.na(Bgam_sex_stocha_VKCK)) %>% 
                       pull(ID),] %>%
 pheatmap(., 
          cluster_cols = F, 
          show_rownames = F,
-         # labels_row = PfPDB_genes%>% filter(gene_id %in% (stocha_gns %>% filter(if_any(matches('dir_all_d.*ale_in_CDB'), ~.== 'correlated') )  %>% pull(ID)))  %>% pull(Gene),
+         # labels_row = PfPDB_genes%>% filter(gene_id %in% (stocha_pk_gns %>% filter(!is.na(Bgam_sex_stocha_VKCK))  %>% pull(ID)))  %>% pull(Gene),
         show_colnames = F,
          annotation_row = CDgam_annot,
         annotation_col = sorted_gam_scale_data_ffirst_bcodes %>% rename('Gametocytes' = anno_300cells) %>%dplyr::select(Gametocytes),
@@ -2996,16 +1960,16 @@ pheatmap(.,
 
 ```{r, fig.width= 12, fig.height=10}
 # options(repr.plot.width=12, repr.plot.height=5)
-sorted_asx_gam_scale_data[stocha_gns %>% 
+sorted_asx_gam_scale_data[stocha_pk_gns %>% 
                       # filter(if_any(contains('drivers'), ~str_detect(.,'all_days')))%>% 
                       # filter(is.na(CDgam_sex) | CDgam_sex != 'Female,Male') %>%
                       # filter(is.na(Bgam_sex) | Bgam_sex != 'Female,Male') %>% 
-                      filter(if_any(matches('dir_all_d.*ale_in_CDB'), ~.== 'correlated') ) %>% 
+                      filter(!is.na(Bgam_sex_stocha_VKCK)) %>% 
                       pull(ID),] %>%
 pheatmap(., 
          cluster_cols = F, 
          show_rownames = F,
-         # labels_row = PfPDB_genes%>% filter(gene_id %in% (stocha_gns %>% filter(if_any(matches('dir_all_d.*ale_in_CDB'), ~.== 'correlated') )  %>% pull(ID)))  %>% pull(Gene),
+         # labels_row = PfPDB_genes%>% filter(gene_id %in% (stocha_pk_gns %>% filter(!is.na(Bgam_sex_stocha_VKCK))  %>% pull(ID)))  %>% pull(Gene),
         show_colnames = F,
          annotation_row = CDgam_annot,
         annotation_col = sorted_asx_gam_scale_data_ffirst_bcodes %>% rename('Stages' = stage_bfs) %>%dplyr::select(Stages),
@@ -3021,16 +1985,12 @@ pheatmap(.,
 
 ```{r, fig.width= 12, fig.height=10}
 # options(repr.plot.width=12, repr.plot.height=5)
-male_sorted_asx_gam_scale_data[stocha_gns %>% 
-                      filter(if_any(contains('drivers'), ~str_detect(.,'all_days')))%>% 
-                      # filter(is.na(CDgam_sex) | CDgam_sex != 'Female,Male') %>%
-                      # filter(is.na(Bgam_sex) | Bgam_sex != 'Female,Male') %>% 
-                      filter(if_any(matches('dir_all_d.*ale_in_CDB'), ~.== 'correlated') ) %>% 
+male_sorted_asx_gam_scale_data[stocha_pk_gns %>% 
+                      filter(!is.na(Bgam_sex_stocha_VKCK)) %>% 
                       pull(ID),] %>%
 pheatmap(., 
          cluster_cols = F, 
          show_rownames = F,
-         # labels_row = PfPDB_genes%>% filter(gene_id %in% (stocha_gns %>% filter(if_any(matches('dir_all_d.*ale_in_CDB'), ~.== 'correlated') )  %>% pull(ID)))  %>% pull(Gene),
         show_colnames = F,
          annotation_row = CDgam_annot,
         annotation_col = male_sorted_asx_gam_scale_data_ffirst_bcodes %>% rename('Stages' = stage_bfs) %>%dplyr::select(Stages),
@@ -3046,16 +2006,12 @@ pheatmap(.,
 
 ```{r, fig.width= 12, fig.height=10}
 # options(repr.plot.width=12, repr.plot.height=5)
-female_sorted_asx_gam_scale_data[stocha_gns %>% 
-                      filter(if_any(contains('drivers'), ~str_detect(.,'all_days')))%>% 
-                      # filter(is.na(CDgam_sex) | CDgam_sex != 'Female,Male') %>%
-                      filter(is.na(Bgam_sex) | Bgam_sex != 'Female,Male') %>% 
-                      filter(if_any(matches('dir_all_d.*ale_in_CDB'), ~.== 'correlated') ) %>% 
+female_sorted_asx_gam_scale_data[stocha_pk_gns %>% 
+                      filter(!is.na(Bgam_sex_stocha_VKCK)) %>% 
                       pull(ID),] %>%
 pheatmap(., 
          cluster_cols = F, 
          show_rownames = F,
-         # labels_row = PfPDB_genes%>% filter(gene_id %in% (stocha_gns %>% filter(if_any(matches('dir_all_d.*ale_in_CDB'), ~.== 'correlated') )  %>% pull(ID)))  %>% pull(Gene),
         show_colnames = F,
          annotation_row = CDgam_annot,
         annotation_col = female_sorted_asx_gam_scale_data_ffirst_bcodes %>% rename('Stages' = stage_bfs) %>%dplyr::select(Stages),
@@ -3071,17 +2027,12 @@ pheatmap(.,
 
 ```{r, fig.width= 12, fig.height=10}
 ##Including asexual stages
-
-#all_days
-# options(repr.plot.width=12, repr.plot.height=5)
-sorted_asx_gam_scale_data[stocha_gns%>% 
-                            # filter(if_any(contains('drivers'), ~str_detect(.,'all_days')))%>% 
-                            filter(!is.na(lR_eT_Asex_gam_all_days) & !is.na(lR_eT_Asex_gam_all_days_anti)) %>%
+sorted_asx_gam_scale_data[stocha_pk_gns%>% 
+                            filter(!is.na(Asex_gam_stocha_VKCK) & !is.na(Asex_gam_stocha_VKCK_anti)) %>%
                             pull(ID),] %>%
 pheatmap(., 
          cluster_cols = F, 
          show_rownames = F,
-         # labels_row = PfPDB_genes%>% filter(gene_id %in% (stocha_gns %>% filter(if_any(matches('dir_all_d.*ale_in_CDB'), ~.== 'correlated') )  %>% pull(ID)))  %>% pull(Gene),
         show_colnames = F,
          annotation_row = asx_gam_annot,
         annotation_col = sorted_asx_gam_scale_data_ffirst_bcodes %>% rename('Stage' = stage_bfs) %>%dplyr::select(Stage),
@@ -3092,35 +2043,8 @@ pheatmap(.,
                                   `Stage anti-correlation`=dr_stage_col),
         fontsize = 20)
          
-# options(repr.plot.width=7, repr.plot.height=7)
 ```
 
-```{r}
-# CDgam_annot %>% 
-# filter(SexDE != 'Not DE' & `Sex correlation` == SexDE)
-```
-
-```{r, fig.width= 12, fig.height=7}
-# options(repr.plot.width=12, repr.plot.height=7)
-sorted_gam_scale_data[CDgam_annot %>% 
-                      filter(SexDE != 'Not DE' & `Sex correlation` == SexDE) %>% rownames(),] %>%
-pheatmap(., 
-         cluster_cols = F, 
-         show_rownames = F,
-         # labels_row = PfPDB_genes%>% filter(gene_id %in% (stocha_gns %>% filter(if_any(matches('dir_all_d.*ale_in_CDB'), ~.== 'correlated') )  %>% pull(ID)))  %>% pull(Gene),
-        show_colnames = F,
-         annotation_row = CDgam_annot %>% 
-         filter(SexDE != 'Not DE' & `Sex correlation` == SexDE),
-        annotation_col = sorted_gam_scale_data_ffirst_bcodes %>% rename('Gametocytes' = anno_300cells) %>%dplyr::select(Gametocytes),
-         annotation_colors = list(Gametocytes = sorted_gam_scale_data_ffirst_bcodes %>% 
-                                  dplyr::count(anno_300cells, phmap_colors) %>% mutate_if(is.factor, as.character) %>%
-                                  deframe, 
-                                  `Sex correlation` = dr_sex_col, 
-                                  SexDE = de_sex_col[1:2]),
-        fontsize = 20)
-         
-# options(repr.plot.width=7, repr.plot.height=7)
-```
 
 ```{r, fig.width= 12, fig.height=7}
 options(repr.plot.width=12, repr.plot.height=7)
@@ -3129,7 +2053,7 @@ sorted_gam_scale_data[CDgam_annot %>%
 pheatmap(., 
          cluster_cols = F, 
          show_rownames = F,
-         # labels_row = PfPDB_genes%>% filter(gene_id %in% (stocha_gns %>% filter(if_any(matches('dir_all_d.*ale_in_CDB'), ~.== 'correlated') )  %>% pull(ID)))  %>% pull(Gene),
+         # labels_row = PfPDB_genes%>% filter(gene_id %in% (stocha_pk_gns %>% filter(!is.na(Bgam_sex_stocha_VKCK))  %>% pull(ID)))  %>% pull(Gene),
         show_colnames = F,
          annotation_row = CDgam_annot %>% 
          filter(SexDE != 'Not DE' & `Sex correlation` == SexDE),
@@ -3148,44 +2072,19 @@ pheatmap(.,
 ##Bgam ALLDAYS
 ```
 
-```{r}
-##ONLY ALL_DAYS
-Bgam_annot <- stocha_gns %>%
-# filter(if_any(contains('drivers'), ~str_detect(.,'all_days')))%>%  
-# filter(is.na(CDgam_sex) | CDgam_sex != 'Female,Male') %>%
-# filter(is.na(Bgam_sex) | Bgam_sex != 'Female,Male') %>% 
-# filter(if_any(matches('dir_all_d.*ale_in_gambranch'), ~.== 'correlated') ) %>%
-  filter(!is.na(Bgam_sex_all_days) | !is.na(Bgam_sex_all_days_anti)) %>%
-left_join(., fVSm %>% 
-          rownames_to_column("gene_id")  %>%
-          mutate(SexDE = case_when(avg_log2FC > 0 ~ 'Female',
-                                        avg_log2FC < 0 ~ 'Male'),
-                across(gene_id, ~str_replace(., '-', '_') )),
-          by=c('ID'='gene_id')
-          ) %>% 
-mutate(across(SexDE, ~factor(replace_na(.,'Not DE'), levels = c('Female', 'Male', 'Not DE')))) %>% 
-mutate(across(Bgam_sex_all_days, ~factor(replace_na(.,'No bias'), levels = c('Male', 'Female', 'Female,Male', 'No bias')))) %>% 
-mutate(across(Bgam_sex_all_days_anti, ~factor(replace_na(.,'No bias'), levels = c('Male', 'Female', 'Female,Male', 'No bias')))) %>%
-column_to_rownames('ID') %>%
-dplyr::select(SexDE, Bgam_sex_all_days, Bgam_sex_all_days_anti) %>%
-rename('Sex correlation' = Bgam_sex_all_days, 'Sex anti-correlation' = Bgam_sex_all_days_anti)
-```
+
 
 
 
 ```{r, fig.width= 12, fig.height=7}
 options(repr.plot.width=12, repr.plot.height=7)
-sorted_gam_scale_data[stocha_gns %>% 
-                      # filter(if_any(contains('drivers'), ~str_detect(.,'all_days'))) %>% 
-                      # filter(is.na(CDgam_sex) | CDgam_sex != 'Female,Male') %>%
-                      # filter(is.na(Bgam_sex_all_days) | Bgam_sex_all_days != 'Female,Male') %>% 
-                      # filter(if_any(matches('dir_all_d.*ale_in_gambranch'), ~.== 'correlated') ) %>%
+sorted_gam_scale_data[stocha_pk_gns %>% 
                         filter(!is.na(Bgam_sex_all_days) | !is.na(Bgam_sex_all_days_anti)) %>%
                       pull(ID),] %>%
 pheatmap(., 
          cluster_cols = F, 
          show_rownames = F,
-         # labels_row = PfPDB_genes%>% filter(gene_id %in% (stocha_gns %>% filter(if_any(matches('dir_all_d.*ale_in_CDB'), ~.== 'correlated') )  %>% pull(ID)))  %>% pull(Gene),
+         # labels_row = PfPDB_genes%>% filter(gene_id %in% (stocha_pk_gns %>% filter(!is.na(Bgam_sex_stocha_VKCK))  %>% pull(ID)))  %>% pull(Gene),
         show_colnames = F,
          annotation_row = Bgam_annot,
         annotation_col = sorted_gam_scale_data_ffirst_bcodes %>% rename('Gametocytes' = anno_300cells) %>%dplyr::select(Gametocytes),
@@ -3205,17 +2104,12 @@ pheatmap(.,
 
 ```{r, fig.width= 12, fig.height=10}
 # options(repr.plot.width=12, repr.plot.height=5)
-sorted_asx_gam_scale_data[stocha_gns %>% 
-                      # filter(if_any(contains('drivers'), ~str_detect(.,'all_days')))%>% 
-                      # filter(is.na(CDgam_sex) | CDgam_sex != 'Female,Male') %>%
-                      # filter(is.na(Bgam_sex) | Bgam_sex != 'Female,Male') %>% 
-                      # filter(if_any(matches('dir_all_d.*ale_in_gam'), ~.== 'correlated') ) %>% 
-                        filter(!is.na(Bgam_sex_all_days) | !is.na(Bgam_sex_all_days_anti)) %>%
+sorted_asx_gam_scale_data[stocha_pk_gns %>% 
                       pull(ID),] %>%
 pheatmap(., 
          cluster_cols = F, 
          show_rownames = F,
-         # labels_row = PfPDB_genes%>% filter(gene_id %in% (stocha_gns %>% filter(if_any(matches('dir_all_d.*ale_in_CDB'), ~.== 'correlated') )  %>% pull(ID)))  %>% pull(Gene),
+         # labels_row = PfPDB_genes%>% filter(gene_id %in% (stocha_pk_gns %>% filter(!is.na(Bgam_sex_stocha_VKCK))  %>% pull(ID)))  %>% pull(Gene),
         show_colnames = F,
          annotation_row = Bgam_annot,
         annotation_col = sorted_asx_gam_scale_data_ffirst_bcodes %>% rename('Stages' = stage_bfs) %>%dplyr::select(Stages),
@@ -3232,17 +2126,13 @@ pheatmap(.,
 
 ```{r, fig.width= 12, fig.height=10}
 # options(repr.plot.width=12, repr.plot.height=5)
-male_sorted_asx_gam_scale_data[stocha_gns %>% 
-                      # filter(if_any(contains('drivers'), ~str_detect(.,'all_days')))%>% 
-                      # filter(is.na(CDgam_sex) | CDgam_sex != 'Female,Male') %>%
-                      # filter(is.na(Bgam_sex) | Bgam_sex != 'Female,Male') %>% 
-                      # filter(if_any(matches('dir_all_d.*ale_in_gam'), ~.== 'correlated') ) %>% 
+male_sorted_asx_gam_scale_data[stocha_pk_gns %>% 
                         filter(!is.na(Bgam_sex_all_days) | !is.na(Bgam_sex_all_days_anti)) %>%
                       pull(ID),] %>%
 pheatmap(., 
          cluster_cols = F, 
          show_rownames = F,
-         # labels_row = PfPDB_genes%>% filter(gene_id %in% (stocha_gns %>% filter(if_any(matches('dir_all_d.*ale_in_CDB'), ~.== 'correlated') )  %>% pull(ID)))  %>% pull(Gene),
+         # labels_row = PfPDB_genes%>% filter(gene_id %in% (stocha_pk_gns %>% filter(!is.na(Bgam_sex_stocha_VKCK))  %>% pull(ID)))  %>% pull(Gene),
         show_colnames = F,
          annotation_row = Bgam_annot,
         annotation_col = male_sorted_asx_gam_scale_data_ffirst_bcodes %>% rename('Stages' = stage_bfs) %>%dplyr::select(Stages),
@@ -3259,17 +2149,13 @@ pheatmap(.,
 
 ```{r, fig.width= 12, fig.height=10}
 # options(repr.plot.width=12, repr.plot.height=5)
-female_sorted_asx_gam_scale_data[stocha_gns %>% 
-                      # filter(if_any(contains('drivers'), ~str_detect(.,'all_days')))%>% 
-                      # filter(is.na(CDgam_sex) | CDgam_sex != 'Female,Male') %>%
-                      # filter(is.na(Bgam_sex) | Bgam_sex != 'Female,Male') %>% 
-                      # filter(if_any(matches('dir_all_d.*ale_in_gam'), ~.== 'correlated') ) %>% 
+female_sorted_asx_gam_scale_data[stocha_pk_gns %>% 
                         filter(!is.na(Bgam_sex_all_days) | !is.na(Bgam_sex_all_days_anti)) %>%
                       pull(ID),] %>%
 pheatmap(., 
          cluster_cols = F, 
          show_rownames = F,
-         # labels_row = PfPDB_genes%>% filter(gene_id %in% (stocha_gns %>% filter(if_any(matches('dir_all_d.*ale_in_CDB'), ~.== 'correlated') )  %>% pull(ID)))  %>% pull(Gene),
+         # labels_row = PfPDB_genes%>% filter(gene_id %in% (stocha_pk_gns %>% filter(!is.na(Bgam_sex_stocha_VKCK))  %>% pull(ID)))  %>% pull(Gene),
         show_colnames = F,
          annotation_row = Bgam_annot,
         annotation_col = female_sorted_asx_gam_scale_data_ffirst_bcodes %>% rename('Stages' = stage_bfs) %>%dplyr::select(Stages),
@@ -3287,16 +2173,12 @@ pheatmap(.,
 ```{r, fig.width= 12, fig.height=10}
 # options(repr.plot.width=12, repr.plot.height=5)
 male_sorted_asx_gam_scale_data[stocha_gns %>% 
-                      # filter(if_any(contains('drivers'), ~str_detect(.,'all_days')))%>% 
-                      # filter(is.na(CDgam_sex) | CDgam_sex != 'Female,Male') %>%
-                      # filter(is.na(Bgam_sex) | Bgam_sex != 'Female,Male') %>% 
-                      # filter(if_any(matches('dir_all_d.*ale_in_gam'), ~.== 'correlated') ) %>% 
                         filter(!is.na(Bgam_sex_all_days) & !is.na(Bgam_sex_all_days_anti)) %>%
                       pull(ID),] %>%
 pheatmap(., 
          cluster_cols = F, 
          show_rownames = F,
-         # labels_row = PfPDB_genes%>% filter(gene_id %in% (stocha_gns %>% filter(if_any(matches('dir_all_d.*ale_in_CDB'), ~.== 'correlated') )  %>% pull(ID)))  %>% pull(Gene),
+         # labels_row = PfPDB_genes%>% filter(gene_id %in% (stocha_pk_gns %>% filter(!is.na(Bgam_sex_stocha_VKCK))  %>% pull(ID)))  %>% pull(Gene),
         show_colnames = F,
          annotation_row = Bgam_annot,
         annotation_col = male_sorted_asx_gam_scale_data_ffirst_bcodes %>% rename('Stages' = stage_bfs) %>%dplyr::select(Stages),
@@ -3315,17 +2197,13 @@ pheatmap(.,
 
 ```{r, fig.width= 12, fig.height=10}
 # options(repr.plot.width=12, repr.plot.height=5)
-female_sorted_asx_gam_scale_data[stocha_gns %>% 
-                      # filter(if_any(contains('drivers'), ~str_detect(.,'all_days')))%>% 
-                      # filter(is.na(CDgam_sex) | CDgam_sex != 'Female,Male') %>%
-                      # filter(is.na(Bgam_sex) | Bgam_sex != 'Female,Male') %>% 
-                      # filter(if_any(matches('dir_all_d.*ale_in_gam'), ~.== 'correlated') ) %>% 
+female_sorted_asx_gam_scale_data[stocha_pk_gns %>% 
                         filter(!is.na(Bgam_sex_all_days) & !is.na(Bgam_sex_all_days_anti)) %>%
                       pull(ID),] %>%
 pheatmap(., 
          cluster_cols = F, 
          show_rownames = F,
-         # labels_row = PfPDB_genes%>% filter(gene_id %in% (stocha_gns %>% filter(if_any(matches('dir_all_d.*ale_in_CDB'), ~.== 'correlated') )  %>% pull(ID)))  %>% pull(Gene),
+         # labels_row = PfPDB_genes%>% filter(gene_id %in% (stocha_pk_gns %>% filter(!is.na(Bgam_sex_stocha_VKCK))  %>% pull(ID)))  %>% pull(Gene),
         show_colnames = F,
          annotation_row = Bgam_annot,
         annotation_col = female_sorted_asx_gam_scale_data_ffirst_bcodes %>% rename('Stages' = stage_bfs) %>%dplyr::select(Stages),
@@ -3344,17 +2222,13 @@ pheatmap(.,
 
 ```{r, fig.width= 12, fig.height=10}
 # options(repr.plot.width=12, repr.plot.height=5)
-male_sorted_asx_gam_scale_data[stocha_gns %>% 
-                      # filter(if_any(contains('drivers'), ~str_detect(.,'all_days')))%>% 
-                      # filter(is.na(CDgam_sex) | CDgam_sex != 'Female,Male') %>%
-                      # filter(is.na(Bgam_sex) | Bgam_sex != 'Female,Male') %>% 
-                      # filter(if_any(matches('dir_all_d.*ale_in_gam'), ~.== 'correlated') ) %>% 
+male_sorted_asx_gam_scale_data[stocha_pk_gns %>% 
                         filter(!is.na(Bgam_sex_all_days_anti)) %>%
                       pull(ID),] %>%
 pheatmap(., 
          cluster_cols = F, 
          show_rownames = F,
-         # labels_row = PfPDB_genes%>% filter(gene_id %in% (stocha_gns %>% filter(if_any(matches('dir_all_d.*ale_in_CDB'), ~.== 'correlated') )  %>% pull(ID)))  %>% pull(Gene),
+         # labels_row = PfPDB_genes%>% filter(gene_id %in% (stocha_pk_gns %>% filter(!is.na(Bgam_sex_stocha_VKCK))  %>% pull(ID)))  %>% pull(Gene),
         show_colnames = F,
          annotation_row = Bgam_annot,
         annotation_col = male_sorted_asx_gam_scale_data_ffirst_bcodes %>% rename('Stages' = stage_bfs) %>%dplyr::select(Stages),
@@ -3371,7 +2245,7 @@ pheatmap(.,
 
 ```{r, fig.width= 12, fig.height=10}
 # options(repr.plot.width=12, repr.plot.height=5)
-female_sorted_asx_gam_scale_data[stocha_gns %>% 
+female_sorted_asx_gam_scale_data[stocha_pk_gns %>% 
                       # filter(if_any(contains('drivers'), ~str_detect(.,'all_days')))%>% 
                       # filter(is.na(CDgam_sex) | CDgam_sex != 'Female,Male') %>%
                       # filter(is.na(Bgam_sex) | Bgam_sex != 'Female,Male') %>% 
@@ -3381,7 +2255,7 @@ female_sorted_asx_gam_scale_data[stocha_gns %>%
 pheatmap(., 
          cluster_cols = F, 
          show_rownames = F,
-         # labels_row = PfPDB_genes%>% filter(gene_id %in% (stocha_gns %>% filter(if_any(matches('dir_all_d.*ale_in_CDB'), ~.== 'correlated') )  %>% pull(ID)))  %>% pull(Gene),
+         # labels_row = PfPDB_genes%>% filter(gene_id %in% (stocha_pk_gns %>% filter(!is.na(Bgam_sex_stocha_VKCK))  %>% pull(ID)))  %>% pull(Gene),
         show_colnames = F,
          annotation_row = Bgam_annot,
         annotation_col = female_sorted_asx_gam_scale_data_ffirst_bcodes %>% rename('Stages' = stage_bfs) %>%dplyr::select(Stages),
@@ -3630,7 +2504,7 @@ plotSmoothers(gams_bf2_ts_sce, counts(gams_bf2_sce), gene = rownames(BF2Res)[oBF
 ```{r}
 ggvenn(
   list(BF2_DE = BF2Res %>% arrange(desc(waldStat)) %>% head(n=500) %>% rownames() %>%str_replace(.,'-','_'),
-    # male_dr_gambranch = stocha_gns %>% filter(if_any(matches('dir.*_male_in_gambranch'), ~.== 'correlated') )  %>% pull(ID) ,
+    # male_dr_gambranch = stocha_pk_gns %>% filter(if_any(matches('dir.*_male_in_gambranch'), ~.== 'correlated') )  %>% pull(ID) ,
     male_rv = stocha_pk_gns %>% filter(!is.na(Bgam_sex_stocha_VKCK)&!is.na(Bgam_sex_stocha_VKCK_anti))%>% pull(ID) ,
     male_ptime = stocha_pk_gns %>% filter(!is.na(Bgam_sex_PK)&!is.na(Bgam_sex_PK_anti)) %>% pull(ID)),
   fill_color = c("#0073C2FF", "#EFC000FF", "#868686FF", "#A46868"),
@@ -3802,7 +2676,7 @@ BiocParallel::bpparam()
           
                    
 ```{r}
-counts_asx_gam[stocha_gns %>% 
+counts_asx_gam[stocha_pk_gns %>% 
                       # filter(if_any(contains('drivers'), ~str_detect(.,'all_days')))%>% 
                       # filter(is.na(CDgam_sex) | CDgam_sex != 'Female,Male') %>%
                       # filter(is.na(Bgam_sex) | Bgam_sex != 'Female,Male') %>% 
@@ -3830,7 +2704,7 @@ counts_asx_gam[stocha_gns %>%
                       
 ```{r}
 VBgam_vs_asexual %>% 
-filter(`PlasmoDB ID` %in% (stocha_gns %>% filter(if_any(matches('dir_all_d.*_female_in_gambranch'), ~.== 'correlated') ) %>% pull(ID))) %>% 
+filter(`PlasmoDB ID` %in% (stocha_pk_gns %>% filter(if_any(matches('dir_all_d.*_female_in_gambranch'), ~.== 'correlated') ) %>% pull(ID))) %>% 
 pivot_longer(cols = starts_with('Day'), names_to = 'Days') %>% 
 mutate(across(c('Days'), ~factor(.,levels = VBgam_vs_asexual %>% select(starts_with('Day')) %>% colnames()))) %>%
 # group_by(`PlasmoDB ID`) %>%
@@ -3869,7 +2743,7 @@ sorted_gam_scale_data[Bgam_annot %>%
 pheatmap(., 
          cluster_cols = F, 
          show_rownames = F,
-         # labels_row = PfPDB_genes%>% filter(gene_id %in% (stocha_gns %>% filter(if_any(matches('dir_all_d.*ale_in_CDB'), ~.== 'correlated') )  %>% pull(ID)))  %>% pull(Gene),
+         # labels_row = PfPDB_genes%>% filter(gene_id %in% (stocha_pk_gns %>% filter(!is.na(Bgam_sex_stocha_VKCK))  %>% pull(ID)))  %>% pull(Gene),
         show_colnames = F,
          annotation_row = Bgam_annot %>% 
          filter(SexDE != 'Not DE' & `Sex correlation` == SexDE),
@@ -3909,13 +2783,13 @@ as.matrix()
 ```{r, fig.width= 12, fig.height=7}
 ##Including all days pluy others
 # options(repr.plot.width=12, repr.plot.height=7)
-sorted_gam_scale_data_ffirst2[stocha_gns %>% filter(if_any(matches('dir_all_d.*ale_in_CDB'), ~.== 'correlated') )  %>% pull(ID),] %>%
+sorted_gam_scale_data_ffirst2[stocha_pk_gns %>% filter(!is.na(Bgam_sex_stocha_VKCK))  %>% pull(ID),] %>%
 pheatmap(., 
          cluster_cols = F, 
          show_rownames = F,
-         # labels_row = PfPDB_genes%>% filter(gene_id %in% (stocha_gns %>% filter(if_any(matches('dir_all_d.*ale_in_CDB'), ~.== 'correlated') )  %>% pull(ID)))  %>% pull(Gene),
+         # labels_row = PfPDB_genes%>% filter(gene_id %in% (stocha_pk_gns %>% filter(!is.na(Bgam_sex_stocha_VKCK))  %>% pull(ID)))  %>% pull(Gene),
         show_colnames = F,
-         annotation_row = (stocha_gns %>% filter(if_any(matches('dir_all_d.*ale_in_CDB'), ~.== 'correlated') )  %>% dplyr::select(CDgam_sex, `Gene ID`) %>% column_to_rownames('Gene ID'))%>% rename('Sex correlation' = CDgam_sex),
+         annotation_row = (stocha_pk_gns %>% filter(!is.na(Bgam_sex_stocha_VKCK))  %>% dplyr::select(CDgam_sex, `Gene ID`) %>% column_to_rownames('Gene ID'))%>% rename('Sex correlation' = CDgam_sex),
         annotation_col = sorted_gam_scale_data_ffirst_bcodes %>% rename('Gametocytes' = anno_300cells) %>%dplyr::select(Gametocytes),
         fontsize = 20)
 # options(repr.plot.width=7, repr.plot.height=7)
@@ -3923,13 +2797,13 @@ pheatmap(.,
 
 ```{r, fig.width= 12, fig.height=7}
 options(repr.plot.width=12, repr.plot.height=7)
-sorted_gam_scale_data_ffirst2[stocha_gns %>% filter(if_any(contains('drivers'), ~str_detect(.,'all$'))) %>% filter(if_any(matches('dir_all_d.*ale_in_CDB'), ~.== 'correlated') ) %>% pull(ID),] %>%
+sorted_gam_scale_data_ffirst2[stocha_pk_gns %>% filter(if_any(contains('drivers'), ~str_detect(.,'all$'))) %>% filter(!is.na(Bgam_sex_stocha_VKCK)) %>% pull(ID),] %>%
 pheatmap(., 
          cluster_cols = F, 
          show_rownames = F,
-         # labels_row = PfPDB_genes%>% filter(gene_id %in% (stocha_gns %>% filter(if_any(matches('dir_all_d.*ale_in_CDB'), ~.== 'correlated') )  %>% pull(ID)))  %>% pull(Gene),
+         # labels_row = PfPDB_genes%>% filter(gene_id %in% (stocha_pk_gns %>% filter(!is.na(Bgam_sex_stocha_VKCK))  %>% pull(ID)))  %>% pull(Gene),
         show_colnames = F,
-         annotation_row = (stocha_gns %>% filter(if_any(matches('dir_all_d.*ale_in_CDB'), ~.== 'correlated') )  %>% dplyr::select(CDgam_sex, `Gene ID`) %>% column_to_rownames('Gene ID'))%>% rename('Sex correlation' = CDgam_sex),
+         annotation_row = (stocha_pk_gns %>% filter(!is.na(Bgam_sex_stocha_VKCK))  %>% dplyr::select(CDgam_sex, `Gene ID`) %>% column_to_rownames('Gene ID'))%>% rename('Sex correlation' = CDgam_sex),
         annotation_col = sorted_gam_scale_data_ffirst_bcodes %>% rename('Gametocytes' = anno_300cells) %>%dplyr::select(Gametocytes),
         fontsize = 20)
 # options(repr.plot.width=7, repr.plot.height=7)
@@ -3937,12 +2811,12 @@ pheatmap(.,
 
 ```{r, fig.width= 12, fig.height=7}
 options(repr.plot.width=12, repr.plot.height=7)
-sorted_gam_scale_data[stocha_gns %>% filter(if_any(matches('dir.*ale_in_gambranch'), ~.== 'correlated') )  %>% pull(ID),] %>%
+sorted_gam_scale_data[stocha_pk_gns %>% filter(if_any(matches('dir.*ale_in_gambranch'), ~.== 'correlated') )  %>% pull(ID),] %>%
 pheatmap(., 
          cluster_cols = F, 
          show_rownames = F,
         show_colnames = F,
-         annotation_row = stocha_gns %>% filter(if_any(matches('dir.*ale_in_gambranch'), ~.== 'correlated') )  %>% column_to_rownames('Gene ID') %>% dplyr::select(Bgam_sex)%>% rename('Sex correlation' = Bgam_sex),
+         annotation_row = stocha_pk_gns %>% filter(if_any(matches('dir.*ale_in_gambranch'), ~.== 'correlated') )  %>% column_to_rownames('Gene ID') %>% dplyr::select(Bgam_sex)%>% rename('Sex correlation' = Bgam_sex),
         annotation_col = gams@meta.data %>% rename('Gametocytes' = anno_300cells) %>%dplyr::select(Gametocytes),
         fontsize = 20)
 # options(repr.plot.width=7, repr.plot.height=7)
@@ -3950,18 +2824,18 @@ pheatmap(.,
 
 ```{r}
 VBgam_vs_asexual %>% 
-filter(`PlasmoDB ID` %in% (stocha_gns %>% filter(if_any(matches('dir.*ale_in_gambranch'), ~.== 'correlated') )  %>% pull(ID))) %>%
+filter(`PlasmoDB ID` %in% (stocha_pk_gns %>% filter(if_any(matches('dir.*ale_in_gambranch'), ~.== 'correlated') )  %>% pull(ID))) %>%
 dplyr::select(`PlasmoDB ID`, starts_with('Day')) %>% 
 column_to_rownames("PlasmoDB ID") %>%
 as.matrix() %>%
 pheatmap(., 
          cluster_cols = F, 
          show_rownames = F,
-         annotation_row = stocha_gns %>% filter(if_any(matches('dir.*ale_in_gambranch'), ~.== 'correlated') )  %>% column_to_rownames('Gene ID') %>% dplyr::select(Bgam_sex))
+         annotation_row = stocha_pk_gns %>% filter(if_any(matches('dir.*ale_in_gambranch'), ~.== 'correlated') )  %>% column_to_rownames('Gene ID') %>% dplyr::select(Bgam_sex))
 ```
 
 ```{r}
-stocha_gns %>% filter(if_any(matches('dir_all_d.*ale_in_CDB'), ~.== 'correlated') )  %>% arrange(CDgam_sex)
+stocha_pk_gns %>% filter(!is.na(Bgam_sex_stocha_VKCK))  %>% arrange(CDgam_sex)
 ```
 
 ```{r}
@@ -3971,14 +2845,14 @@ filter(SexDE != 'Not DE' & `Sex correlation` == SexDE)
 
 ```{r}
 # VBreg_functional %>% 
-# right_join(., stocha_gns %>%
+# right_join(., stocha_pk_gns %>%
 #            filter(ID %in% (Bgam_annot %>% 
 #                   filter(SexDE != 'Not DE' & `Sex correlation` == SexDE) %>%
 #                  rownames()))
 ```
 
 ```{r}
-stocha_gns %>%
+stocha_pk_gns %>%
 filter(ID %in% (Bgam_annot %>% 
 filter(SexDE != 'Not DE' & `Sex correlation` == SexDE)%>%
 rownames()))
@@ -4014,7 +2888,7 @@ scale_fill_manual(values = dr_sex_col2)
 
 ```{r}
 # VBreg_functional %>% 
-# right_join(., stocha_gns %>% filter(if_any(matches('dir.*ale_in_gambranch'), ~.== 'correlated') ) , by='ID') %>%
+# right_join(., stocha_pk_gns %>% filter(if_any(matches('dir.*ale_in_gambranch'), ~.== 'correlated') ) , by='ID') %>%
 # count(Bgam_sex, Cluster) %>%
 # ggplot(., aes(x = Cluster, y = n, fill = Bgam_sex)) +
 # geom_col(position = position_dodge2(preserve = 'single'))
@@ -4095,7 +2969,7 @@ hdp1KO %>% head
 ```
 
 ```{r}
-stocha_gns%>%
+stocha_pk_gns%>%
 left_join(., hdp1KO %>% 
           mutate(hdp1KO = case_when(`log2(∆hdp1/NF54) Fold-change` > 0 ~ 'Upregulated',
                                     `log2(∆hdp1/NF54) Fold-change` < 0 ~ 'Downregulated')
@@ -4369,7 +3243,7 @@ stocha_dr_gns%>%
 ```
 
 ```{r}
-stocha_gns %>% left_join(Josling_ap2g_stg1_gam %>% unite('id', c(left_id,right_id), sep = '_', na.rm = TRUE, remove = F) %>% pivot_longer(cols = c(left_id, right_id),names_to = 'relative_pos',values_to = 'ID', values_drop_na = T) , by = 'ID') %>% filter(!is.na(id)) %>%
+stocha_pk_gns %>% left_join(Josling_ap2g_stg1_gam %>% unite('id', c(left_id,right_id), sep = '_', na.rm = TRUE, remove = F) %>% pivot_longer(cols = c(left_id, right_id),names_to = 'relative_pos',values_to = 'ID', values_drop_na = T) , by = 'ID') %>% filter(!is.na(id)) %>%
     filter(if_any(contains('drivers'), ~str_detect(.,'all_days')))  %>% dplyr::count(relative_pos, CDgam_sex, lR_eT_Asex_gam) %>% ggplot(., aes(x = lR_eT_Asex_gam, y = n, fill = CDgam_sex)) +
     geom_col(position = position_dodge2(preserve = 'single'))+ 
     geom_text(aes(label = n), position = position_dodge2(width = 0.8), vjust =0.5, hjust =0.5, size =6)+
@@ -4386,7 +3260,7 @@ stocha_gns %>% left_join(Josling_ap2g_stg1_gam %>% unite('id', c(left_id,right_i
 ```
 
 ```{r}
-stocha_gns %>% left_join(Josling_ap2g_stg1_gam %>% unite('id', c(left_id,right_id), sep = '_', na.rm = TRUE, remove = F) %>% pivot_longer(cols = c(left_id, right_id),names_to = 'relative_pos',values_to = 'ID', values_drop_na = T) , by = 'ID') %>% filter(!is.na(id)) %>%
+stocha_pk_gns %>% left_join(Josling_ap2g_stg1_gam %>% unite('id', c(left_id,right_id), sep = '_', na.rm = TRUE, remove = F) %>% pivot_longer(cols = c(left_id, right_id),names_to = 'relative_pos',values_to = 'ID', values_drop_na = T) , by = 'ID') %>% filter(!is.na(id)) %>%
     filter(if_any(contains('drivers'), ~str_detect(.,'all_days')))  %>% dplyr::count(relative_pos, CDgam_sex, lR_eT_Asex_gam) %>% ggplot(., aes(x = lR_eT_Asex_gam, y = n, fill = CDgam_sex)) +
     geom_col(position = position_dodge2(preserve = 'single'))+ 
     geom_text(aes(label = n), position = position_dodge2(width = 0.8), vjust =0.5, hjust =0.5, size =6)+
@@ -4403,7 +3277,7 @@ stocha_gns %>% left_join(Josling_ap2g_stg1_gam %>% unite('id', c(left_id,right_i
 ```
 
 ```{r}
-stocha_gns %>% left_join(Josling_ap2g_sc_ring %>% unite('id', c(left_id,right_id), sep = '_', na.rm = TRUE, remove = F) %>% pivot_longer(cols = c(left_id, right_id),names_to = 'relative_pos',values_to = 'ID', values_drop_na = T) , by = 'ID') %>% filter(!is.na(id)) %>%
+stocha_pk_gns %>% left_join(Josling_ap2g_sc_ring %>% unite('id', c(left_id,right_id), sep = '_', na.rm = TRUE, remove = F) %>% pivot_longer(cols = c(left_id, right_id),names_to = 'relative_pos',values_to = 'ID', values_drop_na = T) , by = 'ID') %>% filter(!is.na(id)) %>%
     filter(if_any(contains('drivers'), ~str_detect(.,'all_days')))  %>% dplyr::count(relative_pos, CDgam_sex, lR_eT_Asex_gam) %>% ggplot(., aes(x = lR_eT_Asex_gam, y = n, fill = CDgam_sex)) +
     geom_col(position = position_dodge2(preserve = 'single'))+ 
     geom_text(aes(label = n), position = position_dodge2(width = 0.8), vjust =0.5, hjust =0.5, size =6)+
@@ -4420,7 +3294,7 @@ stocha_gns %>% left_join(Josling_ap2g_sc_ring %>% unite('id', c(left_id,right_id
 ```
 
 ```{r}
-stocha_gns %>% left_join(Josling_ap2g_ncc %>% unite('id', c(left_id,right_id), sep = '_', na.rm = TRUE, remove = F) %>% pivot_longer(cols = c(left_id, right_id),names_to = 'relative_pos',values_to = 'ID', values_drop_na = T) , by = 'ID') %>% filter(!is.na(id)) %>%
+stocha_pk_gns %>% left_join(Josling_ap2g_ncc %>% unite('id', c(left_id,right_id), sep = '_', na.rm = TRUE, remove = F) %>% pivot_longer(cols = c(left_id, right_id),names_to = 'relative_pos',values_to = 'ID', values_drop_na = T) , by = 'ID') %>% filter(!is.na(id)) %>%
     filter(if_any(contains('drivers'), ~str_detect(.,'all_days')))  %>% dplyr::count(relative_pos, CDgam_sex, lR_eT_Asex_gam) %>% ggplot(., aes(x = lR_eT_Asex_gam, y = n, fill = CDgam_sex)) +
     geom_col(position = position_dodge2(preserve = 'single'))+ 
     geom_text(aes(label = n), position = position_dodge2(width = 0.8), vjust =0.5, hjust =0.5, size =6)+
@@ -4438,7 +3312,7 @@ stocha_gns %>% left_join(Josling_ap2g_ncc %>% unite('id', c(left_id,right_id), s
 
 ```{r, fig.width= 21, fig.height=10}
 options(repr.plot.width=21, repr.plot.height=10)
-DoHeatmap(gams, features = stocha_gns %>% filter(if_any(matches('dir_all_d.*ale_in_CDB'), ~.== 'correlated') )  %>% arrange(CDgam_sex) %>% pull(ID) %>% str_replace(., '_', '-')) + NoLegend()
+DoHeatmap(gams, features = stocha_pk_gns %>% filter(!is.na(Bgam_sex_stocha_VKCK))  %>% arrange(CDgam_sex) %>% pull(ID) %>% str_replace(., '_', '-')) + NoLegend()
 # options(repr.plot.width=7, repr.plot.height=7)
 ```
 
@@ -4487,11 +3361,11 @@ plot_grid(plotlist = ., labels = names(gams_list), ncol = 2)
 ```
 
 ```{r}
-stocha_gns %>% filter(if_any(matches('dir_all_d.*ale_in_CDB'), ~.== 'correlated') )  %>% pull(ID) %>% str_replace(., '_', '-') %>% length
+stocha_pk_gns %>% filter(!is.na(Bgam_sex_stocha_VKCK))  %>% pull(ID) %>% str_replace(., '_', '-') %>% length
 ```
 
 ```{r}
-# gams@assays$RNA@scale.data[stocha_gns %>% filter(if_any(matches('dir_all_d.*ale_in_CDB'), ~.== 'correlated') )  %>% pull(ID) %>% str_replace(., '_', '-'),]
+# gams@assays$RNA@scale.data[stocha_pk_gns %>% filter(!is.na(Bgam_sex_stocha_VKCK))  %>% pull(ID) %>% str_replace(., '_', '-'),]
 ```
 
 Display Rbrewer coloours
@@ -4559,14 +3433,14 @@ options(repr.plot.width=12, repr.plot.height=7)
 
 list(sorted_gam_scale_data_ffirst_list, sorted_gam_scale_data_ffirst_bcodes_list) %>%
 pmap(
-    ~ ..1[stocha_gns %>% filter(if_any(matches('dir_all_d.*ale_in_CDB'), ~.== 'correlated') )  %>% pull(ID),] %>%
+    ~ ..1[stocha_pk_gns %>% filter(!is.na(Bgam_sex_stocha_VKCK))  %>% pull(ID),] %>%
     pheatmap(
         .,
         cluster_cols = F,
         show_rownames = F,
-        # labels_row = PfPDB_genes%>% filter(gene_id %in% (stocha_gns %>% filter(if_any(matches('dir_all_d.*ale_in_CDB'), ~.== 'correlated') )  %>% pull(ID)))  %>% pull(Gene),
+        # labels_row = PfPDB_genes%>% filter(gene_id %in% (stocha_pk_gns %>% filter(!is.na(Bgam_sex_stocha_VKCK))  %>% pull(ID)))  %>% pull(Gene),
         show_colnames = F,
-        annotation_row = (stocha_gns %>% filter(if_any(matches('dir_all_d.*ale_in_CDB'), ~.== 'correlated') )  %>% dplyr::select(CDgam_sex, `Gene ID`) %>% column_to_rownames('Gene ID'))%>% rename('Sex correlation' = CDgam_sex),
+        annotation_row = (stocha_pk_gns %>% filter(!is.na(Bgam_sex_stocha_VKCK))  %>% dplyr::select(CDgam_sex, `Gene ID`) %>% column_to_rownames('Gene ID'))%>% rename('Sex correlation' = CDgam_sex),
         annotation_col = ..2 %>% rename('Gametocytes' = anno_300cells) %>%dplyr::select(Gametocytes),
         annotation_colors = list(Gametocytes = ..2 %>% dplyr::count(anno_300cells, phmap_colors) %>% mutate_if(is.factor, as.character) %>%deframe, `Sex correlation` = dr_sex_col),
         fontsize = 20
@@ -4584,14 +3458,14 @@ options(repr.plot.width=12, repr.plot.height=7)
 
 list(sorted_gam_scale_data_ffirst_list, sorted_gam_scale_data_ffirst_bcodes_list) %>%
 pmap(
-    ~ ..1[stocha_gns %>% filter(if_any(matches('dir.*ale_in_gambranch'), ~.== 'correlated') )  %>% pull(ID),] %>%
+    ~ ..1[stocha_pk_gns %>% filter(if_any(matches('dir.*ale_in_gambranch'), ~.== 'correlated') )  %>% pull(ID),] %>%
     pheatmap(
         .,
         cluster_cols = F,
         show_rownames = F,
-        # labels_row = PfPDB_genes%>% filter(gene_id %in% (stocha_gns %>% filter(if_any(matches('dir_all_d.*ale_in_CDB'), ~.== 'correlated') )  %>% pull(ID)))  %>% pull(Gene),
+        # labels_row = PfPDB_genes%>% filter(gene_id %in% (stocha_pk_gns %>% filter(!is.na(Bgam_sex_stocha_VKCK))  %>% pull(ID)))  %>% pull(Gene),
         show_colnames = F,
-        annotation_row = stocha_gns %>% filter(if_any(matches('dir.*ale_in_gambranch'), ~.== 'correlated') )  %>% column_to_rownames('Gene ID') %>% dplyr::select(Bgam_sex) %>% rename('Sex correlation' = Bgam_sex),
+        annotation_row = stocha_pk_gns %>% filter(if_any(matches('dir.*ale_in_gambranch'), ~.== 'correlated') )  %>% column_to_rownames('Gene ID') %>% dplyr::select(Bgam_sex) %>% rename('Sex correlation' = Bgam_sex),
         annotation_col = ..2 %>% rename('Gametocytes' = anno_300cells) %>%dplyr::select(Gametocytes),
         annotation_colors = list(Gametocytes = ..2 %>% dplyr::count(anno_300cells, phmap_colors) %>% mutate_if(is.factor, as.character) %>%deframe, `Sex correlation` = dr_sex_col),
         fontsize = 20
@@ -4829,7 +3703,7 @@ left_join(., pf_old_ids_pp %>% dplyr::select(gene_id, `Gene Name or Symbol`, all
 
 ```{r}
 # list('DOZI & CITH KO DR' = DOZI_CITH_KO_new_PfIDs %>% filter(`WT vs DOZI-KO` > 0 & `WT vs CITH-KO` > 0) %>% pull(gene_id) %>% str_replace('-', '_'),
-#             female_dr_CDB = stocha_gns %>% filter(!is.na(female_drivers_in_CDB)  & CDgam_sex == 'Female') %>% pull(ID) ,
+#             female_dr_CDB = stocha_pk_gns %>% filter(!is.na(female_drivers_in_CDB)  & CDgam_sex == 'Female') %>% pull(ID) ,
 #             female_upregulated = fVSm %>% filter(avg_log2FC>0) %>% rownames() %>% str_replace(., '-', '_'),
 #             'Genes with variable kinetics' = vkg_all %>% pull(ID)
 #            )%>%
@@ -4839,7 +3713,7 @@ left_join(., pf_old_ids_pp %>% dplyr::select(gene_id, `Gene Name or Symbol`, all
 
 ```{r}
 ggvenn(list('DOZI & CITH KO DR' = DOZI_CITH_KO_new_PfIDs %>% filter(`WT vs DOZI-KO` > 0 & `WT vs CITH-KO` > 0) %>% pull(gene_id) %>% str_replace('-', '_'),
-            female_dr_CDB = stocha_gns %>% filter(!is.na(female_drivers_in_CDB)  & CDgam_sex == 'Female') %>% pull(ID) ,
+            female_dr_CDB = stocha_pk_gns %>% filter(!is.na(female_drivers_in_CDB)  & CDgam_sex == 'Female') %>% pull(ID) ,
             female_upregulated = fVSm %>% filter(avg_log2FC>0) %>% rownames() %>% str_replace(., '-', '_'),
             'Genes with variable kinetics' = vkg_all %>% pull(ID)
            ),
@@ -4865,12 +3739,12 @@ vkg_all %>% filter(`Gene_ID` %in% (CITH_KO_new_PfIDs %>% filter(`WT vs CITH` > 0
 ```
 
 ```{r}
-stocha_gns %>% filter(!is.na(female_drivers_in_CDB) & CDgam_sex == 'Female') %>% pull(ID)
+stocha_pk_gns %>% filter(!is.na(female_drivers_in_CDB) & CDgam_sex == 'Female') %>% pull(ID)
 ```
 
 ```{r}
 ggvenn(list('CITH KO DR' = CITH_KO_new_PfIDs %>% filter(`WT vs CITH` > 0) %>% pull(gene_id) %>% str_replace('-', '_'),
-            female_dr_CDB = stocha_gns %>% filter(!is.na(female_drivers_in_CDB) & CDgam_sex == 'Female') %>% pull(ID),
+            female_dr_CDB = stocha_pk_gns %>% filter(!is.na(female_drivers_in_CDB) & CDgam_sex == 'Female') %>% pull(ID),
             female_upregulated = fVSm %>% filter(avg_log2FC>0) %>% rownames() %>% str_replace(., '-', '_'),
             'Genes with variable kinetics' = vkg_all %>% pull(`Gene_ID`)
            ),
@@ -4882,8 +3756,8 @@ ggvenn(list('CITH KO DR' = CITH_KO_new_PfIDs %>% filter(`WT vs CITH` > 0) %>% pu
 ```{r}
  
 ggvenn(list('CITH KO DR' = CITH_KO_new_PfIDs %>% filter(`WT vs CITH` > 0) %>% pull(gene_id) %>% str_replace('-', '_'),
-            female_dr_CDB = stocha_gns %>% filter(!is.na(female_drivers_in_CDB) & CDgam_sex == 'Female') %>% pull(ID),
-            female_dr_gambranch = stocha_gns %>% filter(!is.na(female_drivers_in_gambranch) & Bgam_sex == 'Female') %>% pull(ID),
+            female_dr_CDB = stocha_pk_gns %>% filter(!is.na(female_drivers_in_CDB) & CDgam_sex == 'Female') %>% pull(ID),
+            female_dr_gambranch = stocha_pk_gns %>% filter(!is.na(female_drivers_in_gambranch) & Bgam_sex == 'Female') %>% pull(ID),
             'Genes with variable kinetics' = vkg_all %>% pull(`Gene_ID`)
            ),
        fill_color = c("#0073C2FF", "#EFC000FF", "#868686FF", "#A46868"),
@@ -4893,7 +3767,7 @@ ggvenn(list('CITH KO DR' = CITH_KO_new_PfIDs %>% filter(`WT vs CITH` > 0) %>% pu
 
 ```{r}
 ggvenn(list('CITH KO DR' = CITH_KO_new_PfIDs %>% filter(`WT vs CITH` > 0) %>% pull(gene_id) %>% str_replace('-', '_'),
-            female_dr_gambranch = stocha_gns %>% filter(!is.na(female_drivers_in_gambranch) & Bgam_sex == 'Female') %>% pull(ID),
+            female_dr_gambranch = stocha_pk_gns %>% filter(!is.na(female_drivers_in_gambranch) & Bgam_sex == 'Female') %>% pull(ID),
             female_upregulated = fVSm %>% filter(avg_log2FC>0) %>% rownames() %>% str_replace(., '-', '_'),
             'Genes with variable kinetics' = vkg_all %>% pull(`Gene_ID`)
            ),
@@ -4920,8 +3794,8 @@ DOZI_CITH_IP_new_PfIDs %>% filter(`av ratio` > 3)
 
 ```{r}
 ggvenn(list('CITH KO IP' = DOZI_CITH_IP_new_PfIDs %>% filter(`av ratio` > 3) %>% pull(gene_id) %>% str_replace('-', '_'),
-            female_dr_CDB = stocha_gns %>% filter(!is.na(female_drivers_in_CDB) & CDgam_sex == 'Female') %>% pull(ID),
-            female_dr_gambranch = stocha_gns %>% filter(!is.na(female_drivers_in_gambranch) & Bgam_sex == 'Female') %>% pull(ID),
+            female_dr_CDB = stocha_pk_gns %>% filter(!is.na(female_drivers_in_CDB) & CDgam_sex == 'Female') %>% pull(ID),
+            female_dr_gambranch = stocha_pk_gns %>% filter(!is.na(female_drivers_in_gambranch) & Bgam_sex == 'Female') %>% pull(ID),
             'Genes with variable kinetics' = vkg_all %>% pull(`Gene_ID`)
            ),
        fill_color = c("#0073C2FF", "#EFC000FF", "#868686FF", "#A46868"),
@@ -4931,8 +3805,8 @@ ggvenn(list('CITH KO IP' = DOZI_CITH_IP_new_PfIDs %>% filter(`av ratio` > 3) %>%
 
 ```{r}
 ggvenn(list('CITH KO IP' = DOZI_CITH_IP_new_PfIDs %>% filter(`av ratio` > 3) %>% pull(gene_id) %>% str_replace('-', '_'),
-            female_dr_CDB = stocha_gns %>% filter(!is.na(female_drivers_in_CDB) & CDgam_sex == 'Female') %>% pull(ID),
-            female_dr_gambranch = stocha_gns %>% filter(!is.na(female_drivers_in_gambranch) & Bgam_sex == 'Female') %>% pull(ID),
+            female_dr_CDB = stocha_pk_gns %>% filter(!is.na(female_drivers_in_CDB) & CDgam_sex == 'Female') %>% pull(ID),
+            female_dr_gambranch = stocha_pk_gns %>% filter(!is.na(female_drivers_in_gambranch) & Bgam_sex == 'Female') %>% pull(ID),
             'Genes with variable kinetics' = vkg_all %>% pull(`Gene_ID`)
            ),
        fill_color = c("#0073C2FF", "#EFC000FF", "#868686FF", "#A46868"),
@@ -5065,7 +3939,7 @@ geneList[geneList %in% QCd_gene_4vel_unique] %>% length
 ```
 
 ```{r}
-enrichGO(stocha_gns %>% filter( !is.na(female_drivers_in_CDB) & CDgam_sex == 'Female') %>% pull(ID),universe=geneList[geneList %in% QCd_gene_4vel_unique], OrgDb='org.Pf.plasmo.db', keyType ="SYMBOL",ont="BP") %>%
+enrichGO(stocha_pk_gns %>% filter( !is.na(female_drivers_in_CDB) & CDgam_sex == 'Female') %>% pull(ID),universe=geneList[geneList %in% QCd_gene_4vel_unique], OrgDb='org.Pf.plasmo.db', keyType ="SYMBOL",ont="BP") %>%
 dotplot(.,font.size=14,showCategory=4) + theme(legend.key.height = unit(2,'mm'))
 ```
 
@@ -5074,7 +3948,7 @@ dotplot(.,font.size=14,showCategory=4) + theme(legend.key.height = unit(2,'mm'))
 ```
 
 ```{r}
-dr_cdb_enr <- enrichGO(stocha_gns %>% filter(if_any(matches('dir_all_d.*ale_in_CDB'), ~.== 'correlated') )  %>% pull(ID),universe=geneList, OrgDb='org.Pf.plasmo.db', keyType ="SYMBOL",ont="BP")
+dr_cdb_enr <- enrichGO(stocha_pk_gns %>% filter(!is.na(Bgam_sex_stocha_VKCK))  %>% pull(ID),universe=geneList, OrgDb='org.Pf.plasmo.db', keyType ="SYMBOL",ont="BP")
 ```
 
 ```{r}
@@ -5083,40 +3957,40 @@ plot <- dotplot(dr_cdb_enr,font.size=8,showCategory=4) + theme(legend.key.height
 ```
 
 ```{r}
-enrichGO(stocha_gns %>% filter( !is.na(male_drivers_in_CDB) & CDgam_sex == 'Male') %>% pull(ID),universe=geneList[geneList %in% QCd_gene_4vel_unique], OrgDb='org.Pf.plasmo.db', keyType ="SYMBOL",ont="BP")
+enrichGO(stocha_pk_gns %>% filter( !is.na(male_drivers_in_CDB) & CDgam_sex == 'Male') %>% pull(ID),universe=geneList[geneList %in% QCd_gene_4vel_unique], OrgDb='org.Pf.plasmo.db', keyType ="SYMBOL",ont="BP")
 ```
 
 ```{r}
-enrichGO(stocha_gns %>% filter( !is.na(male_drivers_in_CDB) & CDgam_sex == 'Male') %>% pull(ID),universe=geneList[geneList %in% QCd_gene_4vel_unique], OrgDb='org.Pf.plasmo.db', keyType ="SYMBOL",ont="BP") %>%
+enrichGO(stocha_pk_gns %>% filter( !is.na(male_drivers_in_CDB) & CDgam_sex == 'Male') %>% pull(ID),universe=geneList[geneList %in% QCd_gene_4vel_unique], OrgDb='org.Pf.plasmo.db', keyType ="SYMBOL",ont="BP") %>%
 dotplot(.,font.size=14,showCategory=4) + theme(legend.key.height = unit(2,'mm'))
 ```
 
 ```{r}
-enrichGO(stocha_gns %>% filter( !is.na(male_drivers_in_CDB) & CDgam_sex == 'Male') %>% pull(ID),universe=geneList, OrgDb='org.Pf.plasmo.db', keyType ="SYMBOL",ont="BP") 
+enrichGO(stocha_pk_gns %>% filter( !is.na(male_drivers_in_CDB) & CDgam_sex == 'Male') %>% pull(ID),universe=geneList, OrgDb='org.Pf.plasmo.db', keyType ="SYMBOL",ont="BP") 
 ```
 
 ```{r}
-enrichGO(stocha_gns %>% filter( !is.na(female_drivers_in_CDB) & CDgam_sex == 'Female') %>% pull(ID),universe=geneList[geneList %in% QCd_gene_4vel_unique], OrgDb='org.Pf.plasmo.db', keyType ="SYMBOL",ont="BP") %>%
+enrichGO(stocha_pk_gns %>% filter( !is.na(female_drivers_in_CDB) & CDgam_sex == 'Female') %>% pull(ID),universe=geneList[geneList %in% QCd_gene_4vel_unique], OrgDb='org.Pf.plasmo.db', keyType ="SYMBOL",ont="BP") %>%
 dotplot(.,font.size=14,showCategory=4) + theme(legend.key.height = unit(2,'mm'))
 ```
 
 ```{r}
-enrichGO(stocha_gns %>% filter( !is.na(female_drivers_in_CDB) & CDgam_sex == 'Female') %>% pull(ID),universe=geneList, OrgDb='org.Pf.plasmo.db', keyType ="SYMBOL",ont="BP") %>%
+enrichGO(stocha_pk_gns %>% filter( !is.na(female_drivers_in_CDB) & CDgam_sex == 'Female') %>% pull(ID),universe=geneList, OrgDb='org.Pf.plasmo.db', keyType ="SYMBOL",ont="BP") %>%
 dotplot(.,font.size=14,showCategory=4) + theme(legend.key.height = unit(2,'mm'))
 ```
 
 ```{r}
-enrichGO(stocha_gns %>% filter( !is.na(male_drivers_in_gambranch) & Bgam_sex == 'Male') %>% pull(ID),universe=geneList, OrgDb='org.Pf.plasmo.db', keyType ="SYMBOL",ont="BP") %>%
+enrichGO(stocha_pk_gns %>% filter( !is.na(male_drivers_in_gambranch) & Bgam_sex == 'Male') %>% pull(ID),universe=geneList, OrgDb='org.Pf.plasmo.db', keyType ="SYMBOL",ont="BP") %>%
 dotplot(.,font.size=14,showCategory=4) + theme(legend.key.height = unit(2,'mm'))
 ```
 
 ```{r}
-enrichGO(stocha_gns %>% filter( !is.na(male_drivers_in_gambranch) & Bgam_sex == 'Male') %>% pull(ID),universe=geneList[geneList %in% QCd_gene_4vel_unique], OrgDb='org.Pf.plasmo.db', keyType ="SYMBOL",ont="BP") %>%
+enrichGO(stocha_pk_gns %>% filter( !is.na(male_drivers_in_gambranch) & Bgam_sex == 'Male') %>% pull(ID),universe=geneList[geneList %in% QCd_gene_4vel_unique], OrgDb='org.Pf.plasmo.db', keyType ="SYMBOL",ont="BP") %>%
 dotplot(.,font.size=14,showCategory=4) + theme(legend.key.height = unit(2,'mm'))
 ```
 
 ```{r}
-enrichGO(stocha_gns %>% filter( !is.na(male_drivers_in_gambranch) & Bgam_sex == 'Male') %>% pull(ID),universe=geneList, OrgDb='org.Pf.plasmo.db', keyType ="SYMBOL",ont="BP") %>%
+enrichGO(stocha_pk_gns %>% filter( !is.na(male_drivers_in_gambranch) & Bgam_sex == 'Male') %>% pull(ID),universe=geneList, OrgDb='org.Pf.plasmo.db', keyType ="SYMBOL",ont="BP") %>%
 goplot(.)
 ```
 
@@ -5125,12 +3999,12 @@ goplot(.)
 ```
 
 ```{r}
-enrichGO(stocha_gns %>% filter( !is.na(female_drivers_in_gambranch) & Bgam_sex == 'Female') %>% pull(ID),universe=geneList, OrgDb='org.Pf.plasmo.db', keyType ="SYMBOL",ont="BP") %>%
+enrichGO(stocha_pk_gns %>% filter( !is.na(female_drivers_in_gambranch) & Bgam_sex == 'Female') %>% pull(ID),universe=geneList, OrgDb='org.Pf.plasmo.db', keyType ="SYMBOL",ont="BP") %>%
 dotplot(.,font.size=14,showCategory=4) + theme(legend.key.height = unit(2,'mm'))
 ```
 
 ```{r}
-enrichGO(stocha_gns %>% filter( !is.na(female_drivers_in_gambranch) & Bgam_sex == 'Female') %>% pull(ID),universe=geneList[geneList %in% QCd_gene_4vel_unique], OrgDb='org.Pf.plasmo.db', keyType ="SYMBOL",ont="BP") %>%
+enrichGO(stocha_pk_gns %>% filter( !is.na(female_drivers_in_gambranch) & Bgam_sex == 'Female') %>% pull(ID),universe=geneList[geneList %in% QCd_gene_4vel_unique], OrgDb='org.Pf.plasmo.db', keyType ="SYMBOL",ont="BP") %>%
 dotplot(.,font.size=14,showCategory=4) + theme(legend.key.height = unit(2,'mm'))
 ```
 
@@ -5337,14 +4211,14 @@ pmap(~ ..1 %>%
 
 # list(sorted_gam_scale_data_ffirst_list, sorted_gam_scale_data_ffirst_bcodes_list) %>%
 # pmap(
-#     ~ ..1[stocha_gns %>% filter(if_any(matches('dir.*ale_in_gambranch'), ~.== 'correlated') )  %>% pull(ID),] %>%
+#     ~ ..1[stocha_pk_gns %>% filter(if_any(matches('dir.*ale_in_gambranch'), ~.== 'correlated') )  %>% pull(ID),] %>%
 #     pheatmap(
 #         .,
 #         cluster_cols = F,
 #         show_rownames = F,
-#         # labels_row = PfPDB_genes%>% filter(gene_id %in% (stocha_gns %>% filter(if_any(matches('dir_all_d.*ale_in_CDB'), ~.== 'correlated') )  %>% pull(ID)))  %>% pull(Gene),
+#         # labels_row = PfPDB_genes%>% filter(gene_id %in% (stocha_pk_gns %>% filter(!is.na(Bgam_sex_stocha_VKCK))  %>% pull(ID)))  %>% pull(Gene),
 #         show_colnames = F,
-#         annotation_row = stocha_gns %>% filter(if_any(matches('dir.*ale_in_gambranch'), ~.== 'correlated') )  %>% column_to_rownames('Gene ID') %>% dplyr::select(Bgam_sex) %>% rename('Sex correlation' = Bgam_sex),
+#         annotation_row = stocha_pk_gns %>% filter(if_any(matches('dir.*ale_in_gambranch'), ~.== 'correlated') )  %>% column_to_rownames('Gene ID') %>% dplyr::select(Bgam_sex) %>% rename('Sex correlation' = Bgam_sex),
 #         annotation_col = ..2 %>% rename('Gametocytes' = anno_300cells) %>%dplyr::select(Gametocytes),
 #         annotation_colors = list(Gametocytes = ..2 %>% count(anno_300cells, phmap_colors) %>% mutate_if(is.factor, as.character) %>%deframe, `Sex correlation` = dr_sex_col),
 #         fontsize = 20
@@ -5368,9 +4242,9 @@ ef_scv_stochastic[[1]]$obs %>% rename('Gametocytes' = anno_300cells) %>%dplyr::s
 #     pheatmap(., 
 #          cluster_cols = F, 
 #          show_rownames = F,
-#          # labels_row = PfPDB_genes%>% filter(gene_id %in% (stocha_gns %>% filter(if_any(matches('dir_all_d.*ale_in_CDB'), ~.== 'correlated') )  %>% pull(ID)))  %>% pull(Gene),
+#          # labels_row = PfPDB_genes%>% filter(gene_id %in% (stocha_pk_gns %>% filter(!is.na(Bgam_sex_stocha_VKCK))  %>% pull(ID)))  %>% pull(Gene),
 #         show_colnames = F,
-#          # annotation_row = (stocha_gns %>% filter(if_any(matches('dir_all_d.*ale_in_CDB'), ~.== 'correlated') )  %>% dplyr::select(CDgam_sex, `Gene ID`) %>% column_to_rownames('Gene ID'))%>% rename('Sex correlation' = CDgam_sex),
+#          # annotation_row = (stocha_pk_gns %>% filter(!is.na(Bgam_sex_stocha_VKCK))  %>% dplyr::select(CDgam_sex, `Gene ID`) %>% column_to_rownames('Gene ID'))%>% rename('Sex correlation' = CDgam_sex),
 #         annotation_col = ..2$obs %>% rename('Gametocytes' = anno_300cells) %>%dplyr::select(Gametocytes),
 #         fontsize = 20)
 #     )
@@ -5465,9 +4339,9 @@ pmap(
          cluster_cols = F, 
          cluster_rows = F,
          show_rownames = F,
-         # labels_row = PfPDB_genes%>% filter(gene_id %in% (stocha_gns %>% filter(if_any(matches('dir_all_d.*ale_in_CDB'), ~.== 'correlated') )  %>% pull(ID)))  %>% pull(Gene),
+         # labels_row = PfPDB_genes%>% filter(gene_id %in% (stocha_pk_gns %>% filter(!is.na(Bgam_sex_stocha_VKCK))  %>% pull(ID)))  %>% pull(Gene),
         show_colnames = F,
-         # annotation_row = (stocha_gns %>% filter(if_any(matches('dir_all_d.*ale_in_CDB'), ~.== 'correlated') )  %>% dplyr::select(CDgam_sex, `Gene ID`) %>% column_to_rownames('Gene ID'))%>% rename('Sex correlation' = CDgam_sex),
+         # annotation_row = (stocha_pk_gns %>% filter(!is.na(Bgam_sex_stocha_VKCK))  %>% dplyr::select(CDgam_sex, `Gene ID`) %>% column_to_rownames('Gene ID'))%>% rename('Sex correlation' = CDgam_sex),
         annotation_col = ..3 %>%dplyr::select(Gametocytes) ,
         fontsize = 20)
     )
@@ -5485,9 +4359,9 @@ pmap(
         cluster_cols = F,
         show_rownames = F,
         cluster_rows = F,
-        # labels_row = PfPDB_genes%>% filter(gene_id %in% (stocha_gns %>% filter(if_any(matches('dir_all_d.*ale_in_CDB'), ~.== 'correlated') )  %>% pull(ID)))  %>% pull(Gene),
+        # labels_row = PfPDB_genes%>% filter(gene_id %in% (stocha_pk_gns %>% filter(!is.na(Bgam_sex_stocha_VKCK))  %>% pull(ID)))  %>% pull(Gene),
         show_colnames = F,
-        # annotation_row = stocha_gns %>% filter(if_any(matches('dir.*ale_in_gambranch'), ~.== 'correlated') )  %>% column_to_rownames('Gene ID') %>% dplyr::select(Bgam_sex) %>% rename('Sex correlation' = Bgam_sex),
+        # annotation_row = stocha_pk_gns %>% filter(if_any(matches('dir.*ale_in_gambranch'), ~.== 'correlated') )  %>% column_to_rownames('Gene ID') %>% dplyr::select(Bgam_sex) %>% rename('Sex correlation' = Bgam_sex),
         annotation_col = ..3 %>% rename('Gametocytes' = anno_300cells) %>%dplyr::select(Gametocytes),
         annotation_colors = list(Gametocytes = ..3 %>% count(anno_300cells, phmap_colors) %>% mutate_if(is.factor, as.character) %>%deframe, `Sex correlation` = dr_sex_col),
         fontsize = 20
